@@ -3,7 +3,7 @@
 import type React from "react"
 import { useState, useCallback, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Upload, Camera } from "lucide-react"
+import { Upload, Camera, MapPin } from "lucide-react"
 
 export default function StartPage() {
   const router = useRouter()
@@ -12,11 +12,15 @@ export default function StartPage() {
   const [uploading, setUploading] = useState(false)
   const [location, setLocation] = useState<{ lat: number; lng: number; address: string } | null>(null)
   const [loadingLocation, setLoadingLocation] = useState(true)
+  const [manualAddress, setManualAddress] = useState("")
+  const [showManualInput, setShowManualInput] = useState(false)
+  const [geocoding, setGeocoding] = useState(false)
 
   useEffect(() => {
     const captureLocation = async () => {
       if (!navigator.geolocation) {
         setLoadingLocation(false)
+        setShowManualInput(true)
         return
       }
 
@@ -24,7 +28,8 @@ export default function StartPage() {
         const position = await new Promise<GeolocationPosition>((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, {
             enableHighAccuracy: true,
-            timeout: 5000,
+            timeout: 10000,
+            maximumAge: 60000,
           })
         })
 
@@ -36,10 +41,14 @@ export default function StartPage() {
           body: JSON.stringify({ lat, lng }),
         })
 
-        const { address } = await response.json()
-        setLocation({ lat, lng, address })
-      } catch (err) {
-        console.error("[v0] Location capture error:", err)
+        if (response.ok) {
+          const { address } = await response.json()
+          setLocation({ lat, lng, address })
+        } else {
+          setLocation({ lat, lng, address: `${lat.toFixed(5)}, ${lng.toFixed(5)}` })
+        }
+      } catch {
+        setShowManualInput(true)
       } finally {
         setLoadingLocation(false)
       }
@@ -47,6 +56,37 @@ export default function StartPage() {
 
     captureLocation()
   }, [])
+
+  const handleManualAddress = async () => {
+    if (!manualAddress.trim()) return
+    setGeocoding(true)
+
+    try {
+      const response = await fetch("/api/geocode", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address: manualAddress }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setLocation({
+          lat: data.lat || 0,
+          lng: data.lng || 0,
+          address: data.address || manualAddress,
+        })
+        setShowManualInput(false)
+      } else {
+        setLocation({ lat: 0, lng: 0, address: manualAddress })
+        setShowManualInput(false)
+      }
+    } catch {
+      setLocation({ lat: 0, lng: 0, address: manualAddress })
+      setShowManualInput(false)
+    } finally {
+      setGeocoding(false)
+    }
+  }
 
   const handleDrop = useCallback(
     async (e: React.DragEvent) => {
@@ -110,11 +150,60 @@ export default function StartPage() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 md:py-4">
       <div className="w-full max-w-full md:max-w-[800px] space-y-8 md:space-y-12">
-        {loadingLocation && <div className="text-center text-sm text-muted-foreground">Capturing your location...</div>}
-        {location && (
+        {loadingLocation && (
+          <div className="text-center text-sm text-muted-foreground animate-pulse">Capturing your location...</div>
+        )}
+
+        {location && !showManualInput && (
           <div className="border rounded-lg p-3 md:p-4 bg-muted/20 text-sm">
-            <p className="font-medium">Location captured:</p>
-            <p className="text-muted-foreground text-xs md:text-sm">{location.address}</p>
+            <div className="flex items-start gap-2">
+              <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground" />
+              <div>
+                <p className="font-medium">Location captured</p>
+                <p className="text-muted-foreground text-xs md:text-sm">{location.address}</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowManualInput(true)}
+              className="mt-2 text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Change location
+            </button>
+          </div>
+        )}
+
+        {showManualInput && !loadingLocation && (
+          <div className="border rounded-lg p-3 md:p-4 bg-muted/20 text-sm space-y-3">
+            <div className="flex items-start gap-2">
+              <MapPin className="w-4 h-4 mt-0.5 text-muted-foreground" />
+              <p className="font-medium">Where did this happen?</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <input
+                type="text"
+                value={manualAddress}
+                onChange={(e) => setManualAddress(e.target.value)}
+                placeholder="Enter address or location..."
+                className="flex-1 px-3 py-2 rounded border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-foreground"
+                onKeyDown={(e) => e.key === "Enter" && handleManualAddress()}
+              />
+              <button
+                onClick={handleManualAddress}
+                disabled={!manualAddress.trim() || geocoding}
+                className="px-4 py-2 bg-foreground text-background rounded text-sm hover:opacity-90 disabled:opacity-50"
+              >
+                {geocoding ? "..." : "Set"}
+              </button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Location helps establish where events occurred. Optional but recommended.
+            </p>
+            <button
+              onClick={() => setShowManualInput(false)}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Skip for now
+            </button>
           </div>
         )}
 
