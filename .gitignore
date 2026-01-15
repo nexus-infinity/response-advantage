@@ -1,0 +1,17 @@
+node_modules/
+.pnp
+.pnp.js
+coverage/
+dist/
+build/
+.next/
+out/
+.env
+.env*.local
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
