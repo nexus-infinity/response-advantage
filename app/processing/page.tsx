@@ -350,18 +350,17 @@ export default function ProcessingPage() {
   const hasCompletedActions = actions.some((a) => a.status === "complete")
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-4 py-12">
-      <div className="w-full max-w-[900px]">
-        {/* Phase indicator */}
-        <div className="flex items-center justify-center gap-4 mb-8">
+    <main className="min-h-screen flex flex-col items-center px-3 md:px-4 py-8 md:py-12">
+      <div className="w-full max-w-full md:max-w-[900px]">
+        <div className="flex items-center justify-center gap-2 md:gap-4 mb-6 md:mb-8 overflow-x-auto">
           <PhaseSymbol symbol="●" active={phase === "extracting"} complete={!!extracted} />
-          <div className="w-8 h-px bg-border" />
+          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
           <PhaseSymbol symbol="▼" active={phase === "grounding"} complete={!!grounding} />
-          <div className="w-8 h-px bg-border" />
+          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
           <PhaseSymbol symbol="▲" active={phase === "framing"} complete={!!framing} />
-          <div className="w-8 h-px bg-border" />
-          <PhaseSymbol symbol="⚠" active={phase === "incoherence"} complete={incoherence.length > 0} />
-          <div className="w-8 h-px bg-border" />
+          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
+          <PhaseSymbol symbol="◎" active={phase === "incoherence"} complete={incoherence.length > 0} />
+          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
           <PhaseSymbol
             symbol="■"
             active={phase === "offering" || phase === "executing"}
@@ -369,50 +368,47 @@ export default function ProcessingPage() {
           />
         </div>
 
-        {/* Live stream output */}
         <div
           ref={streamRef}
-          className="bg-[#0a0a0a] border border-[#222] rounded-lg p-6 h-[60vh] overflow-y-auto font-mono text-sm leading-relaxed"
+          className="bg-[#0a0a0a] border border-[#222] rounded-lg p-3 md:p-6 h-[50vh] md:h-[60vh] overflow-y-auto font-mono text-xs md:text-sm leading-relaxed"
         >
-          <pre className="whitespace-pre-wrap text-[#e0e0e0]">
+          <pre className="whitespace-pre-wrap text-[#e0e0e0] break-words">
             {streamingText}
             <span className="animate-pulse">▌</span>
           </pre>
         </div>
 
-        {/* Action buttons */}
         {phase === "offering" && actions.length > 0 && (
-          <div className="mt-8 space-y-3">
+          <div className="mt-6 md:mt-8 space-y-3">
             {actions.map((action) => (
               <button
                 key={action.id}
                 onClick={() => executeAction(action.id)}
                 disabled={action.status === "executing" || action.status === "complete"}
-                className={`w-full p-4 rounded-lg border text-left transition-all ${
+                className={`w-full p-3 md:p-4 rounded-lg border text-left transition-all min-h-[60px] ${
                   action.status === "complete"
                     ? "border-green-800 bg-green-950/30 text-green-200"
                     : action.status === "executing"
                       ? "border-yellow-800 bg-yellow-950/30 text-yellow-200 animate-pulse"
-                      : "border-[#333] hover:border-[#555] hover:bg-[#111]"
+                      : "border-[#333] hover:border-[#555] hover:bg-[#111] active:bg-[#1a1a1a]"
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">{action.label}</span>
+                  <span className="font-medium text-sm md:text-base">{action.label}</span>
                   {action.status === "complete" && <span>✓</span>}
                   {action.status === "executing" && <span className="animate-spin">⟳</span>}
                 </div>
-                <p className="text-sm text-muted-foreground mt-1">{action.description}</p>
+                <p className="text-xs md:text-sm text-muted-foreground mt-1">{action.description}</p>
               </button>
             ))}
           </div>
         )}
 
-        {/* Proceed to results */}
         {hasCompletedActions && (
-          <div className="mt-8 flex justify-center">
+          <div className="mt-6 md:mt-8 flex justify-center">
             <button
               onClick={() => router.push(`/result?caseId=${caseId || "preview"}`)}
-              className="px-8 py-3 bg-foreground text-background rounded-lg font-medium hover:opacity-90 transition-opacity"
+              className="w-full md:w-auto px-8 py-3 bg-foreground text-background rounded-lg font-medium hover:opacity-90 transition-opacity"
             >
               View Your Case
             </button>
@@ -426,7 +422,7 @@ export default function ProcessingPage() {
 function PhaseSymbol({ symbol, active, complete }: { symbol: string; active: boolean; complete: boolean }) {
   return (
     <div
-      className={`text-2xl transition-all ${
+      className={`text-lg md:text-2xl transition-all flex-shrink-0 ${
         active ? "scale-125 animate-pulse" : complete ? "opacity-100" : "opacity-30"
       }`}
       style={{

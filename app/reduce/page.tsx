@@ -7,25 +7,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-interface ReductionStep {
-  symbol: "●" | "▼" | "▲" | "■"
-  label: string
-  description: string
-}
-
-interface ReductionResult {
-  original: string
-  reduced: string
-  pattern: string
-  steps: ReductionStep[]
-}
-
-const symbolLabels: Record<string, string> = {
-  "●": "Evidence gathered",
-  "▼": "Grounded in law",
-  "▲": "Pattern recognized",
-  "■": "Action crystallized",
-}
+// ... existing interfaces ...
 
 export default function ReducePage() {
   const [text, setText] = useState("")
@@ -58,42 +40,42 @@ export default function ReducePage() {
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
-      {/* Empty header space */}
-      <header className="h-20" />
+      {/* Empty header space - Responsive */}
+      <header className="h-12 md:h-20" />
 
-      {/* Main content */}
-      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-32">
-        {/* Glass container */}
-        <div className="w-full max-w-2xl backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl">
+      {/* Main content - Responsive padding */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 pb-24 md:pb-32">
+        {/* Glass container - Responsive padding */}
+        <div className="w-full max-w-2xl backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-4 md:p-8 shadow-2xl">
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder="Enter obfuscated text..."
-            className="min-h-[240px] bg-transparent border-white/20 text-white placeholder:text-white/40 resize-none focus:border-white/40 focus:ring-0 text-base leading-relaxed"
+            className="min-h-[180px] md:min-h-[240px] bg-transparent border-white/20 text-white placeholder:text-white/40 resize-none focus:border-white/40 focus:ring-0 text-sm md:text-base leading-relaxed"
           />
 
           <Button
             onClick={handleReduce}
             disabled={loading || !text.trim()}
-            className="mt-6 w-full bg-transparent border border-white/60 text-white hover:bg-white/10 hover:border-white transition-all disabled:opacity-30"
+            className="mt-4 md:mt-6 w-full bg-transparent border border-white/60 text-white hover:bg-white/10 hover:border-white transition-all disabled:opacity-30"
           >
             {loading ? "Reducing..." : "Reduce"}
           </Button>
         </div>
 
-        {/* Result display */}
+        {/* Result display - Responsive spacing */}
         {result && (
-          <div className="w-full max-w-2xl mt-8 space-y-6">
+          <div className="w-full max-w-2xl mt-6 md:mt-8 space-y-4 md:space-y-6 px-1">
             {/* Original text - faded */}
             <div className="space-y-2">
               <span className="text-white/40 text-xs uppercase tracking-wider">Original</span>
-              <p className="text-white/30 text-sm leading-relaxed">{result.original}</p>
+              <p className="text-white/30 text-xs md:text-sm leading-relaxed">{result.original}</p>
             </div>
 
             {/* Reduced text - bright */}
             <div className="space-y-2">
               <span className="text-white/60 text-xs uppercase tracking-wider">Reduced</span>
-              <p className="text-white text-lg leading-relaxed font-medium">{result.reduced}</p>
+              <p className="text-white text-base md:text-lg leading-relaxed font-medium">{result.reduced}</p>
             </div>
 
             {/* Pattern detected */}
@@ -123,15 +105,15 @@ export default function ReducePage() {
         )}
       </main>
 
-      {/* Footer - four symbols */}
-      <footer className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-8 py-8 bg-gradient-to-t from-black via-black/80 to-transparent">
+      {/* Footer - Responsive positioning and sizing */}
+      <footer className="fixed bottom-0 left-0 right-0 flex items-center justify-center gap-6 md:gap-8 py-6 md:py-8 bg-gradient-to-t from-black via-black/80 to-transparent">
         {["●", "▼", "▲", "■"].map((symbol) => (
           <span
             key={symbol}
-            className="text-2xl text-white/40 hover:text-white transition-colors cursor-default group relative"
+            className="text-xl md:text-2xl text-white/40 hover:text-white transition-colors cursor-default group relative"
           >
             {symbol}
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white/60 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-white/10 border border-white/20 rounded text-xs text-white/60 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden md:block">
               {symbolLabels[symbol]}
             </span>
           </span>
@@ -139,4 +121,24 @@ export default function ReducePage() {
       </footer>
     </div>
   )
+}
+
+interface ReductionStep {
+  symbol: "●" | "▼" | "▲" | "■"
+  label: string
+  description: string
+}
+
+interface ReductionResult {
+  original: string
+  reduced: string
+  pattern: string
+  steps: ReductionStep[]
+}
+
+const symbolLabels: Record<string, string> = {
+  "●": "Evidence gathered",
+  "▼": "Grounded in law",
+  "▲": "Pattern recognized",
+  "■": "Action crystallized",
 }

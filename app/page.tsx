@@ -9,7 +9,6 @@ export default function GeometricEntrance() {
   const [activeSymbol, setActiveSymbol] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // The five glyphs from your logo: cycle → triangle → infinity → hourglass → A
   const glyphs = [
     { symbol: "↻", name: "cycle", meaning: "return" },
     { symbol: "△", name: "triangle", meaning: "ground" },
@@ -20,7 +19,6 @@ export default function GeometricEntrance() {
 
   useEffect(() => {
     if (observed) {
-      // Animate through symbols when space is observed
       const sequence = async () => {
         for (let i = 0; i < glyphs.length; i++) {
           setActiveSymbol(i)
@@ -35,7 +33,7 @@ export default function GeometricEntrance() {
   return (
     <main
       ref={containerRef}
-      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-4"
       style={{ background: "var(--background)" }}
     >
       {/* Minimal grid - geometry substrate */}
@@ -50,7 +48,7 @@ export default function GeometricEntrance() {
       />
 
       {/* The constructor space */}
-      <div className="relative z-10 flex flex-col items-center gap-16">
+      <div className="relative z-10 flex flex-col items-center gap-8 md:gap-16">
         {/* Logo - the seed form */}
         <div
           className="relative cursor-pointer transition-all duration-1000"
@@ -60,14 +58,14 @@ export default function GeometricEntrance() {
             opacity: observed ? 0.6 : 1,
           }}
         >
-          <div className="w-40 h-40 relative">
+          <div className="w-28 h-28 md:w-40 md:h-40 relative">
             <Image src="/logo-recognition.png" alt="re-cognition" fill className="object-contain" priority />
           </div>
         </div>
 
         {/* Glyph progression - emerges on observation */}
         <div
-          className="flex items-center gap-8 transition-all duration-1000"
+          className="flex items-center gap-4 md:gap-8 transition-all duration-1000"
           style={{
             opacity: observed ? 1 : 0,
             transform: observed ? "translateY(0)" : "translateY(20px)",
@@ -83,7 +81,7 @@ export default function GeometricEntrance() {
               }}
             >
               <span
-                className="text-4xl font-light transition-all duration-500"
+                className="text-2xl md:text-4xl font-light transition-all duration-500"
                 style={{
                   color: "var(--foreground)",
                   textShadow: activeSymbol === idx ? "0 0 30px var(--foreground)" : "none",
@@ -103,7 +101,9 @@ export default function GeometricEntrance() {
             transform: observed ? "translateY(0)" : "translateY(10px)",
           }}
         >
-          <h1 className="text-2xl font-light tracking-[0.3em] text-foreground/80">re-cognition</h1>
+          <h1 className="text-xl md:text-2xl font-light tracking-[0.2em] md:tracking-[0.3em] text-foreground/80">
+            re-cognition
+          </h1>
         </div>
 
         {/* Entrance - the circle invites */}
@@ -116,11 +116,11 @@ export default function GeometricEntrance() {
           }}
         >
           <div
-            className="w-24 h-24 rounded-full border-2 flex items-center justify-center transition-all duration-500 group-hover:border-foreground"
+            className="w-16 h-16 md:w-24 md:h-24 rounded-full border-2 flex items-center justify-center transition-all duration-500 group-hover:border-foreground"
             style={{ borderColor: "var(--foreground)", opacity: 0.4 }}
           >
             <span
-              className="text-5xl transition-all duration-500 group-hover:opacity-100"
+              className="text-3xl md:text-5xl transition-all duration-500 group-hover:opacity-100"
               style={{ color: "var(--foreground)", opacity: 0.5 }}
             >
               ●
