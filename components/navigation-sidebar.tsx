@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home } from "lucide-react"
+import { Home, Minimize2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const routes = [
@@ -12,10 +12,20 @@ const routes = [
     href: "/",
     color: "text-foreground",
   },
+  {
+    label: "Quick Reduce",
+    icon: Minimize2,
+    href: "/reduce",
+    color: "text-foreground",
+  },
 ]
 
 export function NavigationSidebar() {
   const pathname = usePathname()
+
+  if (pathname === "/reduce") {
+    return null
+  }
 
   return (
     <div className="fixed left-0 top-0 h-screen w-20 bg-card border-r border-border flex flex-col items-center py-8 gap-8 z-50 stone-edge">
