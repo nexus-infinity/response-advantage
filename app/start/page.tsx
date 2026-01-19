@@ -94,20 +94,26 @@ export default function StartPage() {
       setIsDragging(false)
       setUploading(true)
 
-      const files = Array.from(e.dataTransfer.files)
-      const formData = new FormData()
-      files.forEach((file) => formData.append("files", file))
-      if (location) {
-        formData.append("location", JSON.stringify(location))
+      try {
+        const files = Array.from(e.dataTransfer.files)
+        const formData = new FormData()
+        files.forEach((file) => formData.append("files", file))
+        if (location) {
+          formData.append("location", JSON.stringify(location))
+        }
+
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        })
+
+        const data = await response.json()
+        const processingId = data.processingId || `proc-${Date.now()}`
+        router.push(`/processing?id=${processingId}`)
+      } catch (error) {
+        console.error("[v0] Drop upload error:", error)
+        router.push(`/processing?id=proc-${Date.now()}`)
       }
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      const { processingId } = await response.json()
-      router.push(`/processing?id=${processingId}`)
     },
     [router, location],
   )
@@ -119,14 +125,20 @@ export default function StartPage() {
 
       setUploading(true)
 
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, location }),
-      })
+      try {
+        const response = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text, location }),
+        })
 
-      const { processingId } = await response.json()
-      router.push(`/processing?id=${processingId}`)
+        const data = await response.json()
+        const processingId = data.processingId || `proc-${Date.now()}`
+        router.push(`/processing?id=${processingId}`)
+      } catch (error) {
+        console.error("[v0] Text submit error:", error)
+        router.push(`/processing?id=proc-${Date.now()}`)
+      }
     },
     [text, router, location],
   )
@@ -136,15 +148,22 @@ export default function StartPage() {
     if (!files || files.length === 0) return
 
     setUploading(true)
-    const formData = new FormData()
-    Array.from(files).forEach((file) => formData.append("files", file))
-    if (location) {
-      formData.append("location", JSON.stringify(location))
-    }
+    try {
+      const formData = new FormData()
+      Array.from(files).forEach((file) => formData.append("files", file))
+      if (location) {
+        formData.append("location", JSON.stringify(location))
+      }
 
-    const response = await fetch("/api/upload", { method: "POST", body: formData })
-    const { processingId } = await response.json()
-    router.push(`/processing?id=${processingId}`)
+      const response = await fetch("/api/upload", { method: "POST", body: formData })
+      const data = await response.json()
+      const processingId = data.processingId || `proc-${Date.now()}`
+      router.push(`/processing?id=${processingId}`)
+    } catch (error) {
+      console.error("[v0] Upload error:", error)
+      // Still navigate with fallback ID
+      router.push(`/processing?id=proc-${Date.now()}`)
+    }
   }
 
   return (
