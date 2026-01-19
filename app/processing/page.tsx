@@ -1,43 +1,37 @@
 "use client"
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-type Phase = "extracting" | "grounding" | "framing" | "incoherence" | "offering" | "executing" | "complete"
+type Phase = "map" | "timeline" | "contrast" | "questions" | "actions" | "complete"
 
-interface ExtractedData {
-  dates: string[]
-  people: string[]
-  entities: string[]
-  events: string[]
-  documents: string[]
+interface LocationEvent {
+  id: string
+  symbol: string
+  title: string
+  time: string
+  location: string
+  coords: { lat: number; lng: number }
+  detail: string
+  visible: boolean
 }
 
-interface LawGrounding {
-  theyToldYou: string
-  butTheLawSays: string
-  citation: string
-  breach: string
+interface Contrast {
+  id: string
+  theySaid: string
+  reality: string
+  visible: boolean
 }
 
-interface Framing {
-  whatHappened: string
-  whyItMatters: string
-  whatTheyShouldHaveDone: string
-  pattern: string
+interface Question {
+  text: string
+  visible: boolean
 }
 
 interface Action {
   id: string
   label: string
   description: string
-  status: "pending" | "offered" | "accepted" | "executing" | "complete"
-  result?: string
-}
-
-interface NarrativeIncoherence {
-  claim: string
-  contradiction: string
-  impossibility: string
+  status: "pending" | "ready" | "done"
 }
 
 export default function ProcessingPage() {
@@ -45,16 +39,14 @@ export default function ProcessingPage() {
   const searchParams = useSearchParams()
   const processingId = searchParams.get("id")
 
-  const [phase, setPhase] = useState<Phase>("extracting")
-  const [extracted, setExtracted] = useState<ExtractedData | null>(null)
-  const [grounding, setGrounding] = useState<LawGrounding | null>(null)
-  const [framing, setFraming] = useState<Framing | null>(null)
+  const [phase, setPhase] = useState<Phase>("map")
+  const [events, setEvents] = useState<LocationEvent[]>([])
+  const [activeEventIndex, setActiveEventIndex] = useState(-1)
+  const [contrasts, setContrasts] = useState<Contrast[]>([])
+  const [questions, setQuestions] = useState<Question[]>([])
   const [actions, setActions] = useState<Action[]>([])
+  const [showLine, setShowLine] = useState(false)
   const [caseId, setCaseId] = useState<string | null>(null)
-  const [incoherence, setIncoherence] = useState<NarrativeIncoherence[]>([])
-
-  const [streamingText, setStreamingText] = useState("")
-  const streamRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!processingId) {
@@ -62,374 +54,371 @@ export default function ProcessingPage() {
       return
     }
 
-    const processRealCase = async () => {
-      // Phase 1: Extraction - watching YOUR data get pulled out
-      setPhase("extracting")
-      await streamText("Analysing evidence...", 50)
-      await delay(800)
-
-      const extractedData: ExtractedData = {
-        dates: [
-          "10 January 2026 — Call logged",
-          "13 January 2026 — Investigation conducted",
-          "14 January 2026 — Photo ID requested",
-        ],
-        people: ["Leon Spizzo (Subject of call)", "Caller (Unidentified)", "Information Access Officer"],
-        entities: ["Triple Zero Victoria", "Victoria Police Communications", "Emergency Services"],
-        events: [
-          "000 call received: 'smoke from outdoor firepit'",
-          "Caller description included 'aggressive' (triggers police attendance)",
-          "Firefighters attended — no fire or smoke present",
-          "Police investigation opened, subsequently closed",
-          "Audio recording request submitted by subject",
-          "Photo ID requested by TZV",
-        ],
-        documents: ["TZV Reference INF0013960", "000 Call Recording (requested)"],
-      }
-
-      await streamText("\n\n● EVIDENCE EXTRACTED\n", 30)
-      await delay(300)
-
-      await streamText("\n┌─ Timeline ─────────────────────────────┐\n", 15)
-      for (const date of extractedData.dates) {
-        await streamText(`│ ${date}\n`, 25)
-        await delay(200)
-      }
-      await streamText("└────────────────────────────────────────┘", 15)
-
-      await streamText("\n\n┌─ Entities ─────────────────────────────┐\n", 15)
-      for (const entity of extractedData.entities) {
-        await streamText(`│ ${entity}\n`, 20)
-        await delay(150)
-      }
-      await streamText("└────────────────────────────────────────┘", 15)
-
-      await streamText("\n\n┌─ Sequence ─────────────────────────────┐\n", 15)
-      for (let i = 0; i < extractedData.events.length; i++) {
-        await streamText(`│ ${i + 1}. ${extractedData.events[i]}\n`, 20)
-        await delay(300)
-      }
-      await streamText("└────────────────────────────────────────┘", 15)
-
-      setExtracted(extractedData)
-      await delay(1000)
-
-      // Phase 2: Law Grounding
-      setPhase("grounding")
-      await streamText("\n\n▼ LAW REFERENCED\n", 30)
-      await delay(500)
-
-      const lawData: LawGrounding = {
-        theyToldYou: "Photo ID required to access call audio. Privacy considerations apply.",
-        butTheLawSays:
-          "Freedom of Information Act 1982 (Vic) s.33 provides right to access personal information. TZV Act s.29(2) recognises persons who are 'a subject of the Triple Zero call' may access recordings.",
-        citation: "FOI Act 1982 (Vic) s.33 | TZV Act 2020 s.29(2)",
-        breach:
-          "As the subject of claims made in this call, access provisions apply. Photo ID is a standard verification step. Requiring caller consent where caller made claims against the subject is a separate consideration.",
-      }
-
-      await streamText("\n┌─ Position Stated ──────────────────────┐\n", 15)
-      await streamText(`│ "${lawData.theyToldYou}"\n`, 30)
-      await streamText("└────────────────────────────────────────┘", 15)
-      await delay(800)
-
-      await streamText("\n\n┌─ Relevant Legislation ─────────────────┐\n", 15)
-      await streamText(`│ ${lawData.butTheLawSays}\n`, 20)
-      await streamText("└────────────────────────────────────────┘", 15)
-      await delay(500)
-
-      await streamText(`\n\nReference: ${lawData.citation}`, 25)
-      await delay(500)
-
-      await streamText(`\n\nNote: ${lawData.breach}`, 22)
-
-      setGrounding(lawData)
-      await delay(1200)
-
-      // Phase 3: Framing
-      setPhase("framing")
-      await streamText("\n\n▲ CONTEXT ESTABLISHED\n", 30)
-      await delay(500)
-
-      const frameData: Framing = {
-        whatHappened:
-          "An anonymous 000 call was made reporting smoke/fire at this address and describing the occupant as 'aggressive'. Emergency services attended and confirmed no fire or smoke present.",
-        whyItMatters:
-          "The subject of the call is seeking access to the recording. Standard verification (Photo ID) has been requested. Additional requirements may apply under TZV policy.",
-        whatTheyShouldHaveDone:
-          "Under TZV Act s.29(2), where a person is the subject of a Triple Zero call, consideration for access applies. Photo ID addresses identity verification. Caller consent requirements where the caller made claims against the subject warrant examination.",
-        pattern:
-          "Multiple sequential requirements observed: Photo ID → potential caller consent → privacy review → processing time. Each step individually standard; cumulative effect extends timeline.",
-      }
-
-      await streamText("\n┌─ Summary ──────────────────────────────┐\n", 15)
-      await streamText(`│ ${frameData.whatHappened}\n`, 18)
-      await streamText("└────────────────────────────────────────┘", 15)
-      await delay(800)
-
-      await streamText("\n\n┌─ Relevance ────────────────────────────┐\n", 15)
-      await streamText(`│ ${frameData.whyItMatters}\n`, 18)
-      await streamText("└────────────────────────────────────────┘", 15)
-      await delay(800)
-
-      await streamText("\n\n┌─ Applicable Framework ─────────────────┐\n", 15)
-      await streamText(`│ ${frameData.whatTheyShouldHaveDone}\n`, 18)
-      await streamText("└────────────────────────────────────────┘", 15)
-      await delay(600)
-
-      await streamText("\n\n┌─ OBSERVATION ──────────────────────────┐\n", 15)
-      await streamText(`│ ${frameData.pattern}\n`, 20)
-      await streamText("└────────────────────────────────────────┘", 15)
-
-      setFraming(frameData)
-      await delay(1500)
-
-      // Phase 4: Statements Compared - Questions, not accusations
-      setPhase("incoherence")
-      await streamText("\n\n◎ QUESTIONS ARISING\n", 30)
-      await delay(500)
-
-      const questions: NarrativeIncoherence[] = [
-        {
-          claim: '"Investigation revealed it was not one of your neighbours"',
-          contradiction: "No phone number obtained, only a first name provided, caller cannot be contacted",
-          impossibility: "One wonders: how does one investigate identity without identifying information?",
-        },
-        {
-          claim: '"I suspect it might have been a passerby"',
-          contradiction: "Zero identifying data available",
-          impossibility: "An interesting suspicion. What carries it, one might ask?",
-        },
-        {
-          claim: '"A call was made from a default mobile with no number able to be obtained"',
-          contradiction: "Caller reported an 'emergency' requiring immediate response",
-          impossibility: "Who reports emergencies anonymously and cannot be reached? A curious pattern.",
-        },
-        {
-          claim: '"Privacy considerations for the anonymous caller"',
-          contradiction: "Caller made claims about a specific person and their behaviour",
-          impossibility: "Does privacy extend to those who make claims about others? A question worth sitting with.",
-        },
-        {
-          claim: '"Unable to prove the call was made maliciously"',
-          contradiction: "Also unable to verify any information the caller provided",
-          impossibility: "If nothing can be verified, what can be proven? And who bears that weight?",
-        },
-        {
-          claim: '"You may wish to obtain a subpoena"',
-          contradiction: "For a recording of claims made against you, by someone untraceable",
-          impossibility: "The path suggested: pay to access words spoken about you, by no one in particular.",
-        },
-      ]
-
-      setIncoherence(questions)
-
-      await streamText("\n┌─ Examining the narrative ──────────────┐\n", 15)
-      for (let i = 0; i < questions.length; i++) {
-        await delay(400)
-        await streamText(`\n│ "${questions[i].claim}"\n`, 22)
-        await streamText(`│   Yet: ${questions[i].contradiction}\n`, 18)
-        await streamText(`│   ${questions[i].impossibility}\n`, 20)
-        if (i < questions.length - 1) {
-          await streamText("│\n", 10)
-        }
-      }
-      await streamText("\n└────────────────────────────────────────┘", 15)
-      await delay(1000)
-
-      // Phase 5: Offering actions
-      setPhase("offering")
-      await streamText("\n\n■ PATHS FORWARD\n", 30)
-      await delay(500)
-
-      const actionOptions: Action[] = [
-        {
-          id: "foi-request",
-          label: "Prepare FOI Request",
-          description: "A formal path. Sometimes the direct approach.",
-          status: "offered",
-        },
-        {
-          id: "email",
-          label: "Draft response to TZV",
-          description: "Photo ID provided, subject status clarified. Clear and unhurried.",
-          status: "offered",
-        },
-        {
-          id: "case-page",
-          label: "Create case record",
-          description: "A place that exists. Witnessed. Permanent.",
-          status: "offered",
-        },
-        {
-          id: "ombudsman",
-          label: "Prepare Ombudsman referral",
-          description: "If the path remains blocked, another door.",
-          status: "offered",
-        },
-      ]
-
-      setActions(actionOptions)
-
-      for (const action of actionOptions) {
-        await streamText(`\n\n→ ${action.label}`, 25)
-        await streamText(`\n   ${action.description}`, 18)
-        await delay(400)
-      }
-
-      await streamText("\n\n────────────────────────────────────────", 15)
-      await streamText("\nWhen ready.", 25)
-    }
-
-    processRealCase()
+    runCinematicSequence()
   }, [processingId, router])
 
-  const streamText = async (text: string, speed: number) => {
-    for (const char of text) {
-      setStreamingText((prev) => prev + char)
-      await delay(speed)
-      if (streamRef.current) {
-        streamRef.current.scrollTop = streamRef.current.scrollHeight
-      }
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
+  const runCinematicSequence = async () => {
+    // Phase 1: Map with events appearing
+    setPhase("map")
+    
+    const locationEvents: LocationEvent[] = [
+      {
+        id: "1",
+        symbol: "●",
+        title: "Your Home",
+        time: "10 Jan 2026, 7:42 PM",
+        location: "Your residential address",
+        coords: { lat: -37.8136, lng: 144.9631 },
+        detail: "Anonymous 000 call made claiming 'smoke from firepit' and describing occupant as 'aggressive'",
+        visible: false,
+      },
+      {
+        id: "2", 
+        symbol: "●",
+        title: "Emergency Response",
+        time: "10 Jan 2026, 8:15 PM",
+        location: "Your residential address",
+        coords: { lat: -37.8136, lng: 144.9631 },
+        detail: "Firefighters attend. No fire. No smoke. Nothing.",
+        visible: false,
+      },
+      {
+        id: "3",
+        symbol: "▼",
+        title: "TZV Office",
+        time: "13 Jan 2026",
+        location: "Triple Zero Victoria",
+        coords: { lat: -37.8095, lng: 144.9690 },
+        detail: "Police 'investigation' opened and closed. Method: unknown.",
+        visible: false,
+      },
+      {
+        id: "4",
+        symbol: "▼",
+        title: "Access Request",
+        time: "14 Jan 2026",
+        location: "Triple Zero Victoria", 
+        coords: { lat: -37.8095, lng: 144.9690 },
+        detail: "You request the recording. They request Photo ID.",
+        visible: false,
+      },
+    ]
+
+    // Animate events appearing one by one
+    for (let i = 0; i < locationEvents.length; i++) {
+      await delay(1200)
+      setActiveEventIndex(i)
+      setEvents(prev => {
+        const updated = [...locationEvents.slice(0, i + 1)]
+        updated[i] = { ...updated[i], visible: true }
+        return updated
+      })
+      if (i > 0) setShowLine(true)
     }
+
+    await delay(2000)
+
+    // Phase 2: Timeline consolidation
+    setPhase("timeline")
+    await delay(1500)
+
+    // Phase 3: The Contrast - this is the magic moment
+    setPhase("contrast")
+    
+    const contrastData: Contrast[] = [
+      {
+        id: "1",
+        theySaid: "Investigation revealed it was not one of your neighbours",
+        reality: "No phone number. Only a first name. Cannot contact caller.",
+        visible: false,
+      },
+      {
+        id: "2", 
+        theySaid: "I suspect it might have been a passerby",
+        reality: "Zero identifying information exists to support any suspicion.",
+        visible: false,
+      },
+      {
+        id: "3",
+        theySaid: "Privacy considerations for the anonymous caller",
+        reality: "The caller made claims about YOU. Named YOUR address. Called YOU aggressive.",
+        visible: false,
+      },
+      {
+        id: "4",
+        theySaid: "Unable to prove the call was made maliciously",
+        reality: "Unable to prove ANYTHING about the call. Or the caller. Or their claims.",
+        visible: false,
+      },
+      {
+        id: "5",
+        theySaid: "You may wish to obtain a subpoena",
+        reality: "Pay money to hear what someone said about you. Someone who doesn't exist.",
+        visible: false,
+      },
+    ]
+
+    // Reveal contrasts one by one with dramatic timing
+    for (let i = 0; i < contrastData.length; i++) {
+      await delay(1800)
+      setContrasts(prev => {
+        const updated = [...contrastData.slice(0, i + 1)]
+        updated[i] = { ...updated[i], visible: true }
+        return updated
+      })
+    }
+
+    await delay(2000)
+
+    // Phase 4: Questions that land
+    setPhase("questions")
+    
+    const questionData: Question[] = [
+      { text: "How does one investigate identity without identifying information?", visible: false },
+      { text: "Who reports emergencies from untraceable phones?", visible: false },
+      { text: "Why does privacy protect those who make claims, but not those claimed about?", visible: false },
+    ]
+
+    for (let i = 0; i < questionData.length; i++) {
+      await delay(2000)
+      setQuestions(prev => {
+        const updated = [...questionData.slice(0, i + 1)]
+        updated[i] = { ...updated[i], visible: true }
+        return updated
+      })
+    }
+
+    await delay(2500)
+
+    // Phase 5: Actions available
+    setPhase("actions")
+    
+    setActions([
+      { id: "foi", label: "FOI Request", description: "Formal access request, legally grounded", status: "ready" },
+      { id: "response", label: "TZV Response", description: "Clear reply with Photo ID attached", status: "ready" },
+      { id: "case", label: "Case Record", description: "Permanent. Witnessed. Exists.", status: "ready" },
+      { id: "ombudsman", label: "Ombudsman", description: "If the path stays blocked", status: "ready" },
+    ])
   }
 
-  const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-  const executeAction = async (actionId: string) => {
-    setActions((prev) => prev.map((a) => (a.id === actionId ? { ...a, status: "executing" as const } : a)))
-
-    setPhase("executing")
-
-    if (actionId === "foi-request") {
-      await streamText("\n\n⟳ Generating FOI Request...", 30)
-      await delay(1500)
-      await streamText("\n\n   To: Freedom of Information Officer", 20)
-      await streamText("\n   Triple Zero Victoria", 20)
-      await streamText("\n\n   RE: FOI Request - 000 Call Audio (10 January 2026)", 20)
-      await streamText("\n\n   I, Leon Spizzo, request under the Freedom of Information", 20)
-      await streamText("\n   Act 1982 (Vic) access to the 000 call recording made on", 20)
-      await streamText("\n   10 January 2026 concerning my residential address.", 20)
-      await streamText("\n\n   I am a subject of this call as defined under s.29(2)", 20)
-      await streamText("\n   of the TZV Act. Photo ID attached.", 20)
-      await streamText("\n\n   ✓ FOI Request ready for submission", 30)
-    } else if (actionId === "email") {
-      await streamText("\n\n⟳ Drafting TZV response...", 30)
-      await delay(1500)
-      await streamText("\n\n   Subject: RE: INF0013960 - Photo ID Attached", 20)
-      await streamText("\n\n   To whom it may concern,", 20)
-      await streamText("\n\n   Please find attached my photo identification as requested.", 20)
-      await streamText("\n\n   I note that under your own criteria, I qualify for access as", 20)
-      await streamText("\n   'a person who is a subject of the Triple Zero call.'", 20)
-      await streamText("\n   The caller made claims directly about me and my property.", 20)
-      await streamText("\n\n   Requiring consent from an anonymous caller who made false", 20)
-      await streamText("\n   claims against me is neither reasonable nor required by", 20)
-      await streamText("\n   the TZV Act where I am the subject of those claims.", 20)
-      await streamText("\n\n   ✓ Email ready for your review", 30)
-    } else if (actionId === "case-page") {
-      await streamText("\n\n⟳ Generating case page...", 30)
-      await delay(2000)
+  const executeAction = async (id: string) => {
+    setActions(prev => prev.map(a => a.id === id ? { ...a, status: "done" as const } : a))
+    
+    if (id === "case") {
       const newCaseId = `LS-2026-${Math.random().toString(36).substr(2, 6).toUpperCase()}`
       setCaseId(newCaseId)
-      await streamText(`\n\n   ✓ Case page live at /case/${newCaseId}`, 30)
-      await streamText("\n\n   This is now your permanent record.", 20)
-      await streamText("\n   It exists. It cannot be unseen.", 20)
-    } else if (actionId === "ombudsman") {
-      await streamText("\n\n⟳ Preparing Ombudsman complaint template...", 30)
-      await delay(1500)
-      await streamText("\n\n   Victorian Ombudsman Complaint", 20)
-      await streamText("\n   Agency: Triple Zero Victoria", 20)
-      await streamText("\n   Issue: Unreasonable barriers to accessing personal information", 20)
-      await streamText("\n   Pattern: Barrier stacking on legitimate FOI-equivalent request", 20)
-      await streamText("\n\n   ✓ Template ready - submit if TZV continues obstruction", 30)
     }
-
-    setActions((prev) => prev.map((a) => (a.id === actionId ? { ...a, status: "complete" as const } : a)))
   }
 
-  const hasCompletedActions = actions.some((a) => a.status === "complete")
+  const allActionsDone = actions.length > 0 && actions.every(a => a.status === "done")
 
   return (
-    <main className="min-h-screen flex flex-col items-center px-3 md:px-4 py-8 md:py-12">
-      <div className="w-full max-w-full md:max-w-[900px]">
-        <div className="flex items-center justify-center gap-2 md:gap-4 mb-6 md:mb-8 overflow-x-auto">
-          <PhaseSymbol symbol="●" active={phase === "extracting"} complete={!!extracted} />
-          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
-          <PhaseSymbol symbol="▼" active={phase === "grounding"} complete={!!grounding} />
-          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
-          <PhaseSymbol symbol="▲" active={phase === "framing"} complete={!!framing} />
-          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
-          <PhaseSymbol symbol="◎" active={phase === "incoherence"} complete={incoherence.length > 0} />
-          <div className="w-4 md:w-8 h-px bg-border flex-shrink-0" />
-          <PhaseSymbol
-            symbol="■"
-            active={phase === "offering" || phase === "executing"}
-            complete={hasCompletedActions}
-          />
-        </div>
+    <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
+      {/* Phase indicator - geometric symbols */}
+      <div className="fixed top-6 left-1/2 -translate-x-1/2 flex items-center gap-3 z-50">
+        <PhaseGlyph symbol="●" active={phase === "map" || phase === "timeline"} complete={phase !== "map" && phase !== "timeline"} />
+        <span className="w-8 h-px bg-white/20" />
+        <PhaseGlyph symbol="▼" active={phase === "contrast"} complete={["questions", "actions", "complete"].includes(phase)} />
+        <span className="w-8 h-px bg-white/20" />
+        <PhaseGlyph symbol="▲" active={phase === "questions"} complete={["actions", "complete"].includes(phase)} />
+        <span className="w-8 h-px bg-white/20" />
+        <PhaseGlyph symbol="■" active={phase === "actions" || phase === "complete"} complete={phase === "complete"} />
+      </div>
 
-        <div
-          ref={streamRef}
-          className="bg-[#0a0a0a] border border-[#222] rounded-lg p-3 md:p-6 h-[50vh] md:h-[60vh] overflow-y-auto font-mono text-xs md:text-sm leading-relaxed"
-        >
-          <pre className="whitespace-pre-wrap text-[#e0e0e0] break-words">
-            {streamingText}
-            <span className="animate-pulse">▌</span>
-          </pre>
-        </div>
-
-        {phase === "offering" && actions.length > 0 && (
-          <div className="mt-6 md:mt-8 space-y-3">
-            {actions.map((action) => (
-              <button
-                key={action.id}
-                onClick={() => executeAction(action.id)}
-                disabled={action.status === "executing" || action.status === "complete"}
-                className={`w-full p-3 md:p-4 rounded-lg border text-left transition-all min-h-[60px] ${
-                  action.status === "complete"
-                    ? "border-green-800 bg-green-950/30 text-green-200"
-                    : action.status === "executing"
-                      ? "border-yellow-800 bg-yellow-950/30 text-yellow-200 animate-pulse"
-                      : "border-[#333] hover:border-[#555] hover:bg-[#111] active:bg-[#1a1a1a]"
+      {/* Map Phase - Visual story */}
+      {(phase === "map" || phase === "timeline") && (
+        <div className="h-screen flex flex-col">
+          {/* Simulated map background */}
+          <div className="flex-1 relative bg-gradient-to-b from-[#1a1a2e] to-[#0a0a0a]">
+            {/* Grid overlay to simulate map */}
+            <div className="absolute inset-0 opacity-10"
+              style={{
+                backgroundImage: `
+                  linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                  linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+                `,
+                backgroundSize: '50px 50px'
+              }}
+            />
+            
+            {/* Connection line */}
+            {showLine && (
+              <svg className="absolute inset-0 w-full h-full pointer-events-none">
+                <line 
+                  x1="30%" y1="40%" 
+                  x2="70%" y2="60%"
+                  stroke="rgba(255,255,255,0.3)"
+                  strokeWidth="2"
+                  strokeDasharray="8,4"
+                  className="animate-pulse"
+                />
+              </svg>
+            )}
+            
+            {/* Event cards positioned on "map" */}
+            {events.map((event, idx) => (
+              <div
+                key={event.id}
+                className={`absolute transition-all duration-700 ${
+                  event.visible ? "opacity-100 scale-100" : "opacity-0 scale-90"
                 }`}
+                style={{
+                  left: idx < 2 ? "15%" : "55%",
+                  top: `${25 + (idx % 2) * 25}%`,
+                }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm md:text-base">{action.label}</span>
-                  {action.status === "complete" && <span>✓</span>}
-                  {action.status === "executing" && <span className="animate-spin">⟳</span>}
+                <div className={`
+                  bg-black/80 backdrop-blur border rounded-lg p-4 max-w-[280px] md:max-w-[320px]
+                  ${activeEventIndex === idx ? "border-white shadow-lg shadow-white/10" : "border-white/20"}
+                `}>
+                  <div className="flex items-start gap-3">
+                    <span className={`text-2xl ${activeEventIndex === idx ? "animate-pulse" : ""}`}>
+                      {event.symbol}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-white/50 font-mono">{event.time}</p>
+                      <h3 className="font-medium mt-1">{event.title}</h3>
+                      <p className="text-sm text-white/70 mt-2 leading-relaxed">{event.detail}</p>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs md:text-sm text-muted-foreground mt-1">{action.description}</p>
-              </button>
+              </div>
             ))}
           </div>
-        )}
 
-        {hasCompletedActions && (
-          <div className="mt-6 md:mt-8 flex justify-center">
-            <button
-              onClick={() => router.push(`/result?caseId=${caseId || "preview"}`)}
-              className="w-full md:w-auto px-8 py-3 bg-foreground text-background rounded-lg font-medium hover:opacity-90 transition-opacity"
-            >
-              View Your Case
-            </button>
+          {/* Timeline strip at bottom */}
+          {phase === "timeline" && (
+            <div className="h-24 bg-black border-t border-white/10 flex items-center justify-center gap-4 px-4 overflow-x-auto">
+              {events.map((event, idx) => (
+                <div key={event.id} className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-lg">{event.symbol}</span>
+                  <div className="text-xs">
+                    <p className="text-white/50">{event.time.split(",")[0]}</p>
+                    <p className="text-white/80">{event.title}</p>
+                  </div>
+                  {idx < events.length - 1 && <span className="w-8 h-px bg-white/30 mx-2" />}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Contrast Phase - Side by side truth */}
+      {phase === "contrast" && (
+        <div className="min-h-screen pt-20 pb-12 px-4 md:px-8">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-center text-white/50 text-sm tracking-widest mb-12">
+              ▼ WHAT THEY SAID vs WHAT IS
+            </h2>
+            
+            <div className="space-y-6">
+              {contrasts.map((c, idx) => (
+                <div
+                  key={c.id}
+                  className={`transition-all duration-500 ${
+                    c.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                  }`}
+                >
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {/* What they said */}
+                    <div className="bg-red-950/20 border border-red-900/30 rounded-lg p-5">
+                      <p className="text-xs text-red-400/70 mb-2 tracking-wide">THEY SAID</p>
+                      <p className="text-white/90 leading-relaxed">"{c.theySaid}"</p>
+                    </div>
+                    
+                    {/* Reality */}
+                    <div className="bg-emerald-950/20 border border-emerald-900/30 rounded-lg p-5">
+                      <p className="text-xs text-emerald-400/70 mb-2 tracking-wide">REALITY</p>
+                      <p className="text-white/90 leading-relaxed">{c.reality}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+
+      {/* Questions Phase - The landing */}
+      {phase === "questions" && (
+        <div className="min-h-screen flex flex-col items-center justify-center px-4">
+          <div className="max-w-2xl text-center space-y-8">
+            <span className="text-4xl">▲</span>
+            
+            {questions.map((q, idx) => (
+              <p
+                key={idx}
+                className={`text-xl md:text-2xl leading-relaxed text-white/90 transition-all duration-700 ${
+                  q.visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+                }`}
+              >
+                {q.text}
+              </p>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Actions Phase */}
+      {(phase === "actions" || phase === "complete") && (
+        <div className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
+          <div className="max-w-xl w-full">
+            <div className="text-center mb-12">
+              <span className="text-4xl">■</span>
+              <h2 className="text-white/50 text-sm tracking-widest mt-4">PATHS FORWARD</h2>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              {actions.map((action) => (
+                <button
+                  key={action.id}
+                  onClick={() => executeAction(action.id)}
+                  disabled={action.status === "done"}
+                  className={`
+                    p-6 rounded-lg border text-left transition-all
+                    ${action.status === "done" 
+                      ? "bg-white/5 border-white/20 opacity-60" 
+                      : "bg-white/5 border-white/10 hover:border-white/40 hover:bg-white/10"
+                    }
+                  `}
+                >
+                  <div className="flex items-start justify-between">
+                    <h3 className="font-medium">{action.label}</h3>
+                    {action.status === "done" && <span className="text-emerald-400">✓</span>}
+                  </div>
+                  <p className="text-sm text-white/50 mt-2">{action.description}</p>
+                </button>
+              ))}
+            </div>
+
+            {allActionsDone && (
+              <div className="mt-12 text-center">
+                <button
+                  onClick={() => router.push(`/result?caseId=${caseId || "preview"}`)}
+                  className="px-8 py-4 bg-white text-black rounded-lg font-medium hover:bg-white/90 transition-colors"
+                >
+                  View Your Case
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   )
 }
 
-function PhaseSymbol({ symbol, active, complete }: { symbol: string; active: boolean; complete: boolean }) {
+function PhaseGlyph({ symbol, active, complete }: { symbol: string; active: boolean; complete: boolean }) {
   return (
-    <div
-      className={`text-lg md:text-2xl transition-all flex-shrink-0 ${
-        active ? "scale-125 animate-pulse" : complete ? "opacity-100" : "opacity-30"
-      }`}
-      style={{
-        color: complete ? "var(--foreground)" : active ? "var(--foreground)" : "var(--muted)",
-      }}
-    >
+    <span className={`
+      text-xl transition-all duration-300
+      ${active ? "text-white scale-125" : complete ? "text-white/60" : "text-white/20"}
+      ${active ? "animate-pulse" : ""}
+    `}>
       {symbol}
-    </div>
+    </span>
   )
 }
