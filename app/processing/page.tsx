@@ -1,9 +1,45 @@
 "use client"
 import { useEffect, useState, useRef, useCallback } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { NARRATIVE_STAGES, type Stage, type ContrastComparison } from "@/lib/types/complaint-system"
 
 type Phase = "intro" | "map" | "flying" | "contrast" | "questions" | "actions" | "complete"
 
+// Symbol colors from manifest
+const SYMBOL_COLORS: Record<string, string> = {
+  "●": "#9370DB", // OBI-WAN - Observer
+  "▼": "#FF8C00", // TATA - Evidence  
+  "▲": "#FFD700", // ATLAS - Intelligence
+  "◼": "#0066CC", // DOJO - Manifestation
+}
+
+// Map location event with real address
+interface MapLocationEvent {
+  id: string
+  stage: Stage
+  title: string
+  time: string
+  address: string // Real address - will be geocoded
+  coords: { lat: number; lng: number }
+  detail: string
+  pinColor: string
+}
+
+// Action item
+interface ActionItem {
+  id: string
+  label: string
+  icon: string
+  status: "pending" | "ready" | "done"
+}
+
+// Contrast item
+interface Contrast {
+  theySaid: string
+  reality: string
+}
+
+// Location event
 interface LocationEvent {
   id: string
   symbol: string
@@ -13,26 +49,6 @@ interface LocationEvent {
   coords: { lat: number; lng: number }
   detail: string
   pinColor: string
-}
-
-interface Contrast {
-  theySaid: string
-  reality: string
-}
-
-interface Action {
-  id: string
-  label: string
-  icon: string
-  status: "pending" | "ready" | "done"
-}
-
-// Symbol router colors from the manifest
-const SYMBOL_COLORS: Record<string, string> = {
-  "●": "#9370DB", // OBI-WAN - Observer
-  "▼": "#FF8C00", // TATA - Evidence
-  "▲": "#FFD700", // ATLAS - Intelligence
-  "◼": "#0066CC", // DOJO - Manifestation
 }
 
 export default function ProcessingPage() {
@@ -53,52 +69,86 @@ export default function ProcessingPage() {
   const [activeContrastIndex, setActiveContrastIndex] = useState(-1)
   const [questions, setQuestions] = useState<string[]>([])
   const [activeQuestionIndex, setActiveQuestionIndex] = useState(-1)
-  const [actions, setActions] = useState<Action[]>([])
+  const [actions, setActions] = useState<ActionItem[]>([])
   const [caseId, setCaseId] = useState<string | null>(null)
 
-  // Melbourne coordinates for demo - would come from actual case data
-  const events: LocationEvent[] = [
+  // Events state - will be populated with geocoded addresses
+  const [events, setEvents] = useState<LocationEvent[]>([])
+  const [eventsLoaded, setEventsLoaded] = useState(false)
+
+  // Real addresses for the case - these will be geocoded on load
+  const caseEvents = [
     {
       id: "1",
       symbol: "●",
       title: "YOU WERE HERE",
       time: "10 Jan 2026, 7:42 PM",
-      address: "Residential Address, Melbourne",
-      coords: { lat: -37.8136, lng: 144.9531 },
+      address: "Federation Square, Melbourne, VIC", // Real landmark for demo
       detail: "Anonymous 000 call made. Claimed 'smoke from firepit'. Described you as 'aggressive'.",
-      pinColor: SYMBOL_COLORS["●"],
     },
     {
       id: "2",
       symbol: "●",
       title: "EMERGENCY RESPONSE",
       time: "10 Jan 2026, 8:15 PM",
-      address: "Residential Address, Melbourne",
-      coords: { lat: -37.8136, lng: 144.9531 },
+      address: "Federation Square, Melbourne, VIC",
       detail: "Firefighters arrived. Found nothing. No fire. No smoke. Nothing.",
-      pinColor: SYMBOL_COLORS["●"],
     },
     {
       id: "3",
       symbol: "▼",
       title: "THEY WERE HERE",
       time: "13 Jan 2026",
-      address: "Triple Zero Victoria HQ",
-      coords: { lat: -37.8095, lng: 144.9790 },
+      address: "33 Alfred Street, Melbourne, VIC", // ESTA/Triple Zero Victoria
       detail: "Police 'investigation' opened and closed. How? Unknown.",
-      pinColor: SYMBOL_COLORS["▼"],
     },
     {
       id: "4",
       symbol: "▼",
       title: "YOUR REQUEST",
       time: "14 Jan 2026",
-      address: "Triple Zero Victoria HQ",
-      coords: { lat: -37.8095, lng: 144.9790 },
+      address: "33 Alfred Street, Melbourne, VIC",
       detail: "You asked for the recording. They asked for Photo ID.",
-      pinColor: SYMBOL_COLORS["▼"],
     },
   ]
+
+  // Geocode addresses on mount
+  useEffect(() => {
+    const geocodeEvents = async () => {
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+      
+      const geocodedEvents: LocationEvent[] = await Promise.all(
+        caseEvents.map(async (event) => {
+          let coords = { lat: -37.8136, lng: 144.9631 } // Default Melbourne CBD
+          
+          if (apiKey) {
+            try {
+              const response = await fetch(
+                `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(event.address)}&key=${apiKey}`
+              )
+              const data = await response.json()
+              if (data.status === "OK" && data.results[0]) {
+                coords = data.results[0].geometry.location
+              }
+            } catch (error) {
+              console.error("[v0] Geocoding failed for:", event.address, error)
+            }
+          }
+          
+          return {
+            ...event,
+            coords,
+            pinColor: SYMBOL_COLORS[event.symbol] || SYMBOL_COLORS["●"],
+          }
+        })
+      )
+      
+      setEvents(geocodedEvents)
+      setEventsLoaded(true)
+    }
+    
+    geocodeEvents()
+  }, [])
 
   const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -338,12 +388,12 @@ export default function ProcessingPage() {
     initMap()
   }, [processingId, router, initMap])
 
-  // Start sequence when map loads
+  // Start sequence when map loads AND events are geocoded
   useEffect(() => {
-    if (mapLoaded) {
+    if (mapLoaded && eventsLoaded && events.length > 0) {
       runCinematicSequence()
     }
-  }, [mapLoaded, runCinematicSequence])
+  }, [mapLoaded, eventsLoaded, events.length, runCinematicSequence])
 
   const executeAction = (id: string) => {
     setActions((prev) =>
@@ -357,6 +407,33 @@ export default function ProcessingPage() {
   }
 
   const allDone = actions.length > 0 && actions.every((a) => a.status === "done")
+
+  // Loading state while geocoding
+  if (!eventsLoaded || !mapLoaded) {
+    return (
+      <main className="fixed inset-0 bg-[#0d1117] text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            {["●", "▼", "▲", "◼"].map((s, i) => (
+              <span 
+                key={s} 
+                className="text-3xl animate-pulse"
+                style={{ 
+                  color: SYMBOL_COLORS[s],
+                  animationDelay: `${i * 150}ms`
+                }}
+              >
+                {s}
+              </span>
+            ))}
+          </div>
+          <p className="text-white/50 text-sm tracking-widest">
+            {!eventsLoaded ? "GEOCODING ADDRESSES..." : "LOADING MAP..."}
+          </p>
+        </div>
+      </main>
+    )
+  }
 
   return (
     <main className="fixed inset-0 bg-[#0d1117] text-white overflow-hidden">
