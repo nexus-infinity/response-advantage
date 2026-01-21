@@ -16,12 +16,13 @@ const SYMBOL_COLORS = {
 // Narrative stages - each with DUAL OUTPUT (input -> symbol -> output)
 type NarrativeStage = "chaos" | "observe" | "ground" | "recognise" | "act"
 
-// The dual output structure: what goes IN, what comes OUT
+// DUAL OUTPUT: Quick (actionable sentence) + Deep (comprehensive record)
 const DUAL_OUTPUTS = {
   chaos: {
     label: "You received this...",
     input: null,
-    output: null,
+    quick: null,
+    deep: null,
   },
   observe: {
     symbol: "●",
@@ -30,13 +31,18 @@ const DUAL_OUTPUTS = {
       label: "CHAOS",
       content: "Confusing email about a 000 call. Anonymous caller. Privacy restrictions. No clear path forward.",
     },
-    output: {
-      label: "EVIDENCE",
+    quick: {
+      label: "QUICK",
+      template: "On [date] at [time], a [event] occurred at [location] involving [entities].",
+      filled: "On 10 January 2026 at 7:42 PM, an anonymous 000 call was made about my property at [address], falsely reporting smoke and an aggressive occupant.",
+    },
+    deep: {
+      label: "DEEP",
       items: [
-        { key: "Event", value: "000 Call - False Report" },
-        { key: "Time", value: "10 Jan 2026, 7:42 PM" },
-        { key: "Location", value: "Your residential address" },
-        { key: "Entities", value: "TZV, Anonymous Caller, You" },
+        "Full evidence catalog",
+        "Timestamped files",
+        "Location metadata",
+        "Entity relationships mapped",
       ],
     },
   },
@@ -47,12 +53,18 @@ const DUAL_OUTPUTS = {
       label: "YOUR QUESTION",
       content: '"What are my rights? Can I access the recording? Who has power here?"',
     },
-    output: {
-      label: "YOUR RIGHTS",
+    quick: {
+      label: "QUICK",
+      template: "Under [Act s.XX], you are required to...",
+      filled: "Under the FOI Act s.33, I am entitled to access all personal information held about me. Under TZV Act s.29(2), as the subject of the call, I may access the recording.",
+    },
+    deep: {
+      label: "DEEP",
       items: [
-        { code: "FOI Act s.33", text: "Access to personal information" },
-        { code: "TZV Act s.29(2)", text: "Subject may access call recordings" },
-        { code: "Privacy Act 1988", text: "Your data belongs to you" },
+        "Full legal research",
+        "Relevant precedents",
+        "Jurisdiction analysis",
+        "Compliance requirements",
       ],
     },
   },
@@ -67,12 +79,18 @@ const DUAL_OUTPUTS = {
         '"Unable to prove malicious intent"',
       ],
     },
-    output: {
-      label: "REALITY",
+    quick: {
+      label: "QUICK",
+      template: "You stated [X], however [Y] contradicts this because [Z].",
+      filled: "You stated the investigation 'revealed' the caller's identity, however you also state no phone number was obtained and the caller cannot be contacted. How can an identity be revealed without identifying information?",
+    },
+    deep: {
+      label: "DEEP",
       items: [
-        "No phone number was obtained",
-        "Caller named YOU, not themselves",
-        "Unable to prove ANYTHING - no data",
+        "Timeline of contradictions",
+        "Pattern analysis",
+        "Institutional behavior mapping",
+        "Response gap identification",
       ],
     },
   },
@@ -83,13 +101,18 @@ const DUAL_OUTPUTS = {
       label: "STUCK",
       content: "Feeling powerless. No clear next step. Institutional maze designed to exhaust.",
     },
-    output: {
-      label: "READY",
+    quick: {
+      label: "QUICK",
+      name: "Ready-to-send FOI Request",
+      preview: "To: Freedom of Information Officer\nRe: FOI Request - 000 Call Recording\n\nI am writing to request access to...",
+    },
+    deep: {
+      label: "DEEP",
       items: [
-        { name: "FOI Request", status: "ready" },
-        { name: "Formal Response", status: "ready" },
-        { name: "Ombudsman Referral", status: "ready" },
-        { name: "Case Record", status: "permanent" },
+        "Complete case record",
+        "Response tracking",
+        "Escalation pathways",
+        "Permanent documentation",
       ],
     },
   },
@@ -313,220 +336,254 @@ export default function LandingPage() {
               </div>
             )}
 
-            {/* ● OBSERVE - DUAL OUTPUT: Chaos -> Evidence */}
+            {/* ● OBSERVE - QUICK/DEEP DUAL OUTPUT */}
             {stage === "observe" && (
               <div className="animate-in fade-in duration-700">
-                <div className="grid md:grid-cols-[1fr,auto,1fr] gap-4 md:gap-6 items-center">
-                  {/* INPUT - Chaos */}
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-5 animate-in slide-in-from-left duration-500">
-                    <p className="text-[10px] text-white/40 tracking-widest mb-3">{DUAL_OUTPUTS.observe.input?.label}</p>
-                    <p className="text-white/60 text-sm leading-relaxed">{DUAL_OUTPUTS.observe.input?.content}</p>
+                {/* Input -> Symbol row */}
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 max-w-xs">
+                    <p className="text-white/50 text-xs">{DUAL_OUTPUTS.observe.input?.content}</p>
                   </div>
-
-                  {/* SYMBOL - The Processor */}
-                  <div className="flex flex-col items-center justify-center py-4 md:py-0">
-                    <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center animate-pulse"
-                      style={{
-                        backgroundColor: `${SYMBOL_COLORS["●"]}20`,
-                        boxShadow: `0 0 40px ${SYMBOL_COLORS["●"]}50`,
-                      }}
-                    >
-                      <span className="text-4xl md:text-5xl" style={{ color: SYMBOL_COLORS["●"] }}>●</span>
-                    </div>
-                    <p className="text-xs mt-2 font-medium tracking-wider" style={{ color: SYMBOL_COLORS["●"] }}>
-                      DOCUMENT
-                    </p>
-                  </div>
-
-                  {/* OUTPUT - Evidence */}
                   <div
-                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
+                    className="w-14 h-14 rounded-full flex items-center justify-center animate-pulse shrink-0"
+                    style={{
+                      backgroundColor: `${SYMBOL_COLORS["●"]}20`,
+                      boxShadow: `0 0 30px ${SYMBOL_COLORS["●"]}50`,
+                    }}
+                  >
+                    <span className="text-3xl" style={{ color: SYMBOL_COLORS["●"] }}>●</span>
+                  </div>
+                </div>
+
+                {/* QUICK / DEEP side by side */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* QUICK - Copy-paste ready */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-left duration-500"
                     style={{ backgroundColor: `${SYMBOL_COLORS["●"]}10`, borderColor: `${SYMBOL_COLORS["●"]}40` }}
                   >
-                    <p className="text-[10px] tracking-widest mb-3" style={{ color: SYMBOL_COLORS["●"] }}>
-                      {DUAL_OUTPUTS.observe.output?.label}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["●"] }}>●</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["●"] }}>QUICK</span>
+                      <span className="text-[10px] text-white/30 ml-auto">copy-paste ready</span>
+                    </div>
+                    <p className="text-white/40 text-xs font-mono mb-2">{DUAL_OUTPUTS.observe.quick?.template}</p>
+                    <p className="text-white/90 text-sm leading-relaxed bg-black/30 rounded-lg p-3 border border-white/10">
+                      {DUAL_OUTPUTS.observe.quick?.filled}
                     </p>
+                  </div>
+
+                  {/* DEEP - Comprehensive record */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
+                    style={{ borderColor: `${SYMBOL_COLORS["●"]}30`, backgroundColor: "rgba(0,0,0,0.3)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["●"] }}>●</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["●"] }}>DEEP</span>
+                      <span className="text-[10px] text-white/30 ml-auto">full record</span>
+                    </div>
                     <div className="space-y-2">
-                      {DUAL_OUTPUTS.observe.output?.items.map((item, idx) => (
-                        <div key={idx} className="flex items-start gap-2 text-sm">
-                          <span className="text-white/40 font-mono text-xs w-16 shrink-0">{item.key}</span>
-                          <span className="text-white/90">{item.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ▼ GROUND - DUAL OUTPUT: Question -> Rights */}
-            {stage === "ground" && (
-              <div className="animate-in fade-in duration-700">
-                <div className="grid md:grid-cols-[1fr,auto,1fr] gap-4 md:gap-6 items-center">
-                  {/* INPUT - Your Question */}
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-5 animate-in slide-in-from-left duration-500">
-                    <p className="text-[10px] text-white/40 tracking-widest mb-3">{DUAL_OUTPUTS.ground.input?.label}</p>
-                    <p className="text-white/60 text-sm leading-relaxed italic">{DUAL_OUTPUTS.ground.input?.content}</p>
-                  </div>
-
-                  {/* SYMBOL - The Processor */}
-                  <div className="flex flex-col items-center justify-center py-4 md:py-0">
-                    <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: `${SYMBOL_COLORS["▼"]}20`,
-                        boxShadow: `0 0 40px ${SYMBOL_COLORS["▼"]}50`,
-                      }}
-                    >
-                      <span className="text-4xl md:text-5xl animate-bounce" style={{ color: SYMBOL_COLORS["▼"] }}>▼</span>
-                    </div>
-                    <p className="text-xs mt-2 font-medium tracking-wider" style={{ color: SYMBOL_COLORS["▼"] }}>
-                      GROUND
-                    </p>
-                  </div>
-
-                  {/* OUTPUT - Your Rights */}
-                  <div
-                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
-                    style={{ backgroundColor: `${SYMBOL_COLORS["▼"]}10`, borderColor: `${SYMBOL_COLORS["▼"]}40` }}
-                  >
-                    <p className="text-[10px] tracking-widest mb-3" style={{ color: SYMBOL_COLORS["▼"] }}>
-                      {DUAL_OUTPUTS.ground.output?.label}
-                    </p>
-                    <div className="space-y-3">
-                      {DUAL_OUTPUTS.ground.output?.items.map((law, idx) => (
+                      {DUAL_OUTPUTS.observe.deep?.items.map((item, idx) => (
                         <div
                           key={idx}
-                          className="animate-in slide-in-from-bottom duration-500"
-                          style={{ animationDelay: `${idx * 150}ms` }}
-                        >
-                          <span
-                            className="text-[10px] font-mono px-2 py-0.5 rounded"
-                            style={{ backgroundColor: `${SYMBOL_COLORS["▼"]}30`, color: SYMBOL_COLORS["▼"] }}
-                          >
-                            {law.code}
-                          </span>
-                          <p className="text-white/80 text-sm mt-1">{law.text}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ▲ RECOGNISE - DUAL OUTPUT: They Said -> Reality */}
-            {stage === "recognise" && (
-              <div className="animate-in fade-in duration-700">
-                <div className="grid md:grid-cols-[1fr,auto,1fr] gap-4 md:gap-6 items-start">
-                  {/* INPUT - They Said */}
-                  <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-5 animate-in slide-in-from-left duration-500">
-                    <p className="text-[10px] text-red-400/80 tracking-widest mb-3">{DUAL_OUTPUTS.recognise.input?.label}</p>
-                    <div className="space-y-3">
-                      {DUAL_OUTPUTS.recognise.input?.items?.map((item, idx) => (
-                        <p key={idx} className="text-white/60 text-sm italic">{item}</p>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* SYMBOL - The Processor */}
-                  <div className="flex flex-col items-center justify-center py-4 md:py-8">
-                    <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: `${SYMBOL_COLORS["▲"]}20`,
-                        boxShadow: `0 0 40px ${SYMBOL_COLORS["▲"]}50`,
-                      }}
-                    >
-                      <span
-                        className="text-4xl md:text-5xl"
-                        style={{
-                          color: SYMBOL_COLORS["▲"],
-                          animation: "pulse 2s ease-in-out infinite",
-                        }}
-                      >
-                        ▲
-                      </span>
-                    </div>
-                    <p className="text-xs mt-2 font-medium tracking-wider" style={{ color: SYMBOL_COLORS["▲"] }}>
-                      RECOGNISE
-                    </p>
-                  </div>
-
-                  {/* OUTPUT - Reality */}
-                  <div
-                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
-                    style={{ backgroundColor: `${SYMBOL_COLORS["▲"]}10`, borderColor: `${SYMBOL_COLORS["▲"]}40` }}
-                  >
-                    <p className="text-[10px] tracking-widest mb-3" style={{ color: SYMBOL_COLORS["▲"] }}>
-                      {DUAL_OUTPUTS.recognise.output?.label}
-                    </p>
-                    <div className="space-y-3">
-                      {DUAL_OUTPUTS.recognise.output?.items?.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-2 animate-in slide-in-from-bottom duration-500"
-                          style={{ animationDelay: `${idx * 150}ms` }}
-                        >
-                          <span className="text-emerald-400 mt-0.5">+</span>
-                          <p className="text-white/90 text-sm">{item}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ◼ ACT - DUAL OUTPUT: Stuck -> Ready */}
-            {stage === "act" && (
-              <div className="animate-in fade-in duration-700">
-                <div className="grid md:grid-cols-[1fr,auto,1fr] gap-4 md:gap-6 items-center">
-                  {/* INPUT - Stuck */}
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-5 animate-in slide-in-from-left duration-500 opacity-50">
-                    <p className="text-[10px] text-white/40 tracking-widest mb-3">{DUAL_OUTPUTS.act.input?.label}</p>
-                    <p className="text-white/50 text-sm leading-relaxed line-through">{DUAL_OUTPUTS.act.input?.content}</p>
-                  </div>
-
-                  {/* SYMBOL - The Processor */}
-                  <div className="flex flex-col items-center justify-center py-4 md:py-0">
-                    <div
-                      className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: `${SYMBOL_COLORS["◼"]}20`,
-                        boxShadow: `0 0 40px ${SYMBOL_COLORS["◼"]}50`,
-                      }}
-                    >
-                      <span className="text-4xl md:text-5xl" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
-                    </div>
-                    <p className="text-xs mt-2 font-medium tracking-wider" style={{ color: SYMBOL_COLORS["◼"] }}>
-                      ACT
-                    </p>
-                  </div>
-
-                  {/* OUTPUT - Ready */}
-                  <div
-                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
-                    style={{ backgroundColor: `${SYMBOL_COLORS["◼"]}10`, borderColor: `${SYMBOL_COLORS["◼"]}40` }}
-                  >
-                    <p className="text-[10px] tracking-widest mb-3" style={{ color: SYMBOL_COLORS["◼"] }}>
-                      {DUAL_OUTPUTS.act.output?.label}
-                    </p>
-                    <div className="space-y-2">
-                      {DUAL_OUTPUTS.act.output?.items.map((action, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-3 animate-in slide-in-from-bottom duration-500"
+                          className="flex items-center gap-2 text-sm animate-in slide-in-from-bottom duration-300"
                           style={{ animationDelay: `${idx * 100}ms` }}
                         >
-                          <span
-                            className={`w-2 h-2 rounded-full ${
-                              action.status === "permanent" ? "bg-amber-400" : "bg-emerald-400"
-                            }`}
-                          />
-                          <span className="text-white/90 text-sm font-medium">{action.name}</span>
-                          <span className="text-[10px] text-white/40 ml-auto uppercase">{action.status}</span>
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: SYMBOL_COLORS["●"] }} />
+                          <span className="text-white/70">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ▼ GROUND - QUICK/DEEP DUAL OUTPUT */}
+            {stage === "ground" && (
+              <div className="animate-in fade-in duration-700">
+                {/* Input -> Symbol row */}
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 max-w-xs">
+                    <p className="text-white/50 text-xs italic">{DUAL_OUTPUTS.ground.input?.content}</p>
+                  </div>
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: `${SYMBOL_COLORS["▼"]}20`,
+                      boxShadow: `0 0 30px ${SYMBOL_COLORS["▼"]}50`,
+                    }}
+                  >
+                    <span className="text-3xl animate-bounce" style={{ color: SYMBOL_COLORS["▼"] }}>▼</span>
+                  </div>
+                </div>
+
+                {/* QUICK / DEEP side by side */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* QUICK - Copy-paste ready */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-left duration-500"
+                    style={{ backgroundColor: `${SYMBOL_COLORS["▼"]}10`, borderColor: `${SYMBOL_COLORS["▼"]}40` }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["▼"] }}>▼</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["▼"] }}>QUICK</span>
+                      <span className="text-[10px] text-white/30 ml-auto">copy-paste ready</span>
+                    </div>
+                    <p className="text-white/40 text-xs font-mono mb-2">{DUAL_OUTPUTS.ground.quick?.template}</p>
+                    <p className="text-white/90 text-sm leading-relaxed bg-black/30 rounded-lg p-3 border border-white/10">
+                      {DUAL_OUTPUTS.ground.quick?.filled}
+                    </p>
+                  </div>
+
+                  {/* DEEP - Comprehensive record */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
+                    style={{ borderColor: `${SYMBOL_COLORS["▼"]}30`, backgroundColor: "rgba(0,0,0,0.3)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["▼"] }}>▼</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["▼"] }}>DEEP</span>
+                      <span className="text-[10px] text-white/30 ml-auto">full research</span>
+                    </div>
+                    <div className="space-y-2">
+                      {DUAL_OUTPUTS.ground.deep?.items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm animate-in slide-in-from-bottom duration-300"
+                          style={{ animationDelay: `${idx * 100}ms` }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: SYMBOL_COLORS["▼"] }} />
+                          <span className="text-white/70">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ▲ RECOGNISE - QUICK/DEEP DUAL OUTPUT */}
+            {stage === "recognise" && (
+              <div className="animate-in fade-in duration-700">
+                {/* Input -> Symbol row */}
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="bg-red-500/10 border border-red-500/20 rounded-lg px-4 py-2 max-w-xs">
+                    <p className="text-white/50 text-xs italic">"{DUAL_OUTPUTS.recognise.input?.items?.[0]}"</p>
+                  </div>
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: `${SYMBOL_COLORS["▲"]}20`,
+                      boxShadow: `0 0 30px ${SYMBOL_COLORS["▲"]}50`,
+                    }}
+                  >
+                    <span className="text-3xl" style={{ color: SYMBOL_COLORS["▲"], animation: "pulse 2s ease-in-out infinite" }}>▲</span>
+                  </div>
+                </div>
+
+                {/* QUICK / DEEP side by side */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* QUICK - The key contradiction */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-left duration-500"
+                    style={{ backgroundColor: `${SYMBOL_COLORS["▲"]}10`, borderColor: `${SYMBOL_COLORS["▲"]}40` }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["▲"] }}>▲</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["▲"] }}>QUICK</span>
+                      <span className="text-[10px] text-white/30 ml-auto">the key question</span>
+                    </div>
+                    <p className="text-white/40 text-xs font-mono mb-2">{DUAL_OUTPUTS.recognise.quick?.template}</p>
+                    <p className="text-white/90 text-sm leading-relaxed bg-black/30 rounded-lg p-3 border border-white/10">
+                      {DUAL_OUTPUTS.recognise.quick?.filled}
+                    </p>
+                  </div>
+
+                  {/* DEEP - Pattern analysis */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
+                    style={{ borderColor: `${SYMBOL_COLORS["▲"]}30`, backgroundColor: "rgba(0,0,0,0.3)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["▲"] }}>▲</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["▲"] }}>DEEP</span>
+                      <span className="text-[10px] text-white/30 ml-auto">full analysis</span>
+                    </div>
+                    <div className="space-y-2">
+                      {DUAL_OUTPUTS.recognise.deep?.items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm animate-in slide-in-from-bottom duration-300"
+                          style={{ animationDelay: `${idx * 100}ms` }}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: SYMBOL_COLORS["▲"] }} />
+                          <span className="text-white/70">{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ◼ ACT - QUICK/DEEP DUAL OUTPUT */}
+            {stage === "act" && (
+              <div className="animate-in fade-in duration-700">
+                {/* Input -> Symbol row */}
+                <div className="flex items-center justify-center gap-4 mb-6">
+                  <div className="bg-white/5 border border-white/10 rounded-lg px-4 py-2 max-w-xs opacity-50">
+                    <p className="text-white/40 text-xs line-through">{DUAL_OUTPUTS.act.input?.content}</p>
+                  </div>
+                  <div
+                    className="w-14 h-14 rounded-full flex items-center justify-center shrink-0"
+                    style={{
+                      backgroundColor: `${SYMBOL_COLORS["◼"]}20`,
+                      boxShadow: `0 0 30px ${SYMBOL_COLORS["◼"]}50`,
+                    }}
+                  >
+                    <span className="text-3xl" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
+                  </div>
+                </div>
+
+                {/* QUICK / DEEP side by side */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* QUICK - Ready to send */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-left duration-500"
+                    style={{ backgroundColor: `${SYMBOL_COLORS["◼"]}10`, borderColor: `${SYMBOL_COLORS["◼"]}40` }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["◼"] }}>QUICK</span>
+                      <span className="text-[10px] text-white/30 ml-auto">ready to send</span>
+                    </div>
+                    <p className="text-white/60 text-xs mb-2">{DUAL_OUTPUTS.act.quick?.name}</p>
+                    <pre className="text-white/80 text-xs leading-relaxed bg-black/30 rounded-lg p-3 border border-white/10 whitespace-pre-wrap font-mono">
+                      {DUAL_OUTPUTS.act.quick?.preview}
+                    </pre>
+                  </div>
+
+                  {/* DEEP - Full case record */}
+                  <div
+                    className="border rounded-xl p-5 animate-in slide-in-from-right duration-500"
+                    style={{ borderColor: `${SYMBOL_COLORS["◼"]}30`, backgroundColor: "rgba(0,0,0,0.3)" }}
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
+                      <span className="text-[10px] tracking-widest font-bold" style={{ color: SYMBOL_COLORS["◼"] }}>DEEP</span>
+                      <span className="text-[10px] text-white/30 ml-auto">permanent record</span>
+                    </div>
+                    <div className="space-y-2">
+                      {DUAL_OUTPUTS.act.deep?.items.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center gap-2 text-sm animate-in slide-in-from-bottom duration-300"
+                          style={{ animationDelay: `${idx * 100}ms` }}
+                        >
+                          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                          <span className="text-white/70">{item}</span>
                         </div>
                       ))}
                     </div>
