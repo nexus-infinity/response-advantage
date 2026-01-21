@@ -1,16 +1,30 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
 // Symbol colors from manifest
 const SYMBOL_COLORS = {
   chaos: "#666666",
-  "●": "#9370DB", // Observe - purple
-  "▼": "#FF8C00", // Ground - orange
-  "▲": "#FFD700", // Recognise - gold
-  "◼": "#0066CC", // Act - blue
+  "●": "#9370DB", // Document - purple (observation)
+  "▼": "#FF8C00", // Ground - orange (evidence/law)
+  "▲": "#FFD700", // Recognise - gold (pattern detection)
+  "◼": "#0066CC", // Act - blue (manifestation)
+}
+
+// The actual chaotic email content
+const CHAOS_EMAIL = {
+  subject: "RE: Your enquiry INF0013960",
+  from: "Information Access Officer",
+  fragments: [
+    "Our investigation revealed it was not one of your neighbours.",
+    "I suspect it might have been a passerby.",
+    "A call was made from a default mobile with no number able to be obtained.",
+    "The caller gave a first name only and could not be contacted.",
+    "Privacy considerations apply to the anonymous caller.",
+    "You may wish to obtain a subpoena.",
+  ],
 }
 
 // Narrative stages - each with DUAL OUTPUT (input -> symbol -> output)
