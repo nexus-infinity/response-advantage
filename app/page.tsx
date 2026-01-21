@@ -1,315 +1,340 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
 // Symbol colors from manifest
 const SYMBOL_COLORS = {
-  "●": "#9370DB", // Document - purple (observation)
-  "▼": "#FF8C00", // Ground - orange (evidence/law)
-  "▲": "#FFD700", // Recognise - gold (pattern detection)
-  "◼": "#0066CC", // Act - blue (manifestation)
+  chaos: "#666666",
+  "●": "#9370DB", // Observe - purple
+  "▼": "#FF8C00", // Ground - orange
+  "▲": "#FFD700", // Recognise - gold
+  "◼": "#0066CC", // Act - blue
 }
 
-// The chaotic email that transforms
-const CHAOS_EMAIL = `Dear Mr Spizzo,
+// Narrative stages with visual content
+type NarrativeStage = "chaos" | "observe" | "ground" | "recognise" | "act"
 
-Thank you for your enquiry regarding the 000 call. Our investigation revealed it was not one of your neighbours. I suspect it might have been a passerby.
-
-A call was made from a default mobile with no number able to be obtained. The caller gave a first name only and could not be contacted.
-
-Unfortunately we are unable to prove the call was made maliciously. Privacy considerations apply to the anonymous caller. You may wish to obtain a subpoena.
-
-Kind regards,
-Information Access Officer`
-
-// Transformation stages
-const STAGES = [
-  {
-    id: "chaos",
-    symbol: null,
-    title: "You received this...",
-    subtitle: "Confusing. Contradictory. Designed to exhaust.",
+const NARRATIVE_CONTENT = {
+  chaos: {
+    label: "You received this...",
+    documents: [
+      { text: "RE: Your enquiry INF0013960", rotation: -3, offset: { x: -20, y: 10 } },
+      { text: "Privacy considerations apply...", rotation: 2, offset: { x: 30, y: -15 } },
+      { text: "Unable to verify caller identity", rotation: -1, offset: { x: -10, y: 25 } },
+      { text: "You may wish to obtain a subpoena", rotation: 4, offset: { x: 15, y: -5 } },
+    ],
   },
-  {
-    id: "document",
+  observe: {
     symbol: "●",
-    title: "Document",
-    subtitle: "Evidence captured. Location tagged.",
-    extract: ["000 call", "10 Jan 2026", "Your address", "Anonymous caller", "No phone number"],
+    label: "Document",
+    subtitle: "Evidence captured. Location marked.",
+    content: {
+      evidence: "000 Call Recording Request",
+      location: "Federation Square, Melbourne",
+      time: "10 Jan 2026, 7:42 PM",
+    },
   },
-  {
-    id: "ground",
+  ground: {
     symbol: "▼",
-    title: "Ground",
-    subtitle: "Laws and rights surface.",
+    label: "Ground",
+    subtitle: "Laws surface automatically",
     laws: [
-      { cite: "FOI Act s.33", text: "Right to access personal information" },
-      { cite: "TZV Act s.29(2)", text: "Subject of call may access recordings" },
+      { code: "FOI Act s.33", text: "Right to access personal information" },
+      { code: "TZV Act s.29(2)", text: "Subject of call may access recording" },
+      { code: "Privacy Act", text: "Your data, your rights" },
     ],
   },
-  {
-    id: "recognise",
+  recognise: {
     symbol: "▲",
-    title: "Recognise",
-    subtitle: "Contradictions revealed.",
+    label: "Recognise",
+    subtitle: "Contradictions revealed",
     contrasts: [
-      { said: '"Investigation revealed..."', reality: "No identifying info exists" },
-      { said: '"Privacy for anonymous caller"', reality: "Caller named YOU" },
-      { said: '"Unable to prove malicious"', reality: "Unable to prove ANYTHING" },
+      { said: '"Investigation revealed it was not a neighbour"', reality: "No identifying information exists" },
+      { said: '"Privacy for the anonymous caller"', reality: "Caller made claims about YOU" },
     ],
   },
-  {
-    id: "act",
+  act: {
     symbol: "◼",
-    title: "Act",
-    subtitle: "Ready to send.",
-    actions: ["FOI Request", "Formal Response", "Case Record", "Ombudsman Referral"],
+    label: "Act",
+    subtitle: "Ready-to-send documents",
+    actions: [
+      { name: "FOI Request", status: "ready" },
+      { name: "Formal Response", status: "ready" },
+      { name: "Case Record", status: "ready" },
+    ],
   },
-]
+}
 
 export default function LandingPage() {
-  const [currentStage, setCurrentStage] = useState(0)
+  const [stage, setStage] = useState<NarrativeStage>("chaos")
   const [isPlaying, setIsPlaying] = useState(true)
-  const [hasInteracted, setHasInteracted] = useState(false)
+  const [stageProgress, setStageProgress] = useState(0)
 
-  // Auto-play through stages
+  const stages: NarrativeStage[] = ["chaos", "observe", "ground", "recognise", "act"]
+
+  // Auto-play narrative
   useEffect(() => {
     if (!isPlaying) return
-    const durations = [3000, 2500, 2500, 3000, 3000] // Time per stage
-    const timer = setTimeout(() => {
-      setCurrentStage((prev) => {
-        if (prev >= STAGES.length - 1) {
-          return 0 // Loop back
-        }
-        return prev + 1
+
+    const stageDuration = 3500
+    const progressInterval = setInterval(() => {
+      setStageProgress((p) => Math.min(p + 2, 100))
+    }, stageDuration / 50)
+
+    const stageInterval = setInterval(() => {
+      setStage((current) => {
+        const currentIdx = stages.indexOf(current)
+        const nextIdx = (currentIdx + 1) % stages.length
+        setStageProgress(0)
+        return stages[nextIdx]
       })
-    }, durations[currentStage])
-    return () => clearTimeout(timer)
-  }, [currentStage, isPlaying])
+    }, stageDuration)
 
-  const stage = STAGES[currentStage]
-  const stageColor = stage.symbol ? SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS] : "#666"
+    return () => {
+      clearInterval(progressInterval)
+      clearInterval(stageInterval)
+    }
+  }, [isPlaying])
 
-  const handleStageClick = (idx: number) => {
-    setCurrentStage(idx)
+  const goToStage = useCallback((newStage: NarrativeStage) => {
+    setStage(newStage)
+    setStageProgress(0)
     setIsPlaying(false)
-    setHasInteracted(true)
-  }
+  }, [])
+
+  const currentSymbol = stage === "chaos" ? null : NARRATIVE_CONTENT[stage].symbol
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white">
-      {/* Hero Section - Full viewport */}
-      <section className="min-h-screen flex flex-col relative overflow-hidden">
-        {/* Animated background gradient based on current stage */}
+    <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
+      {/* Hero Section - Narrative Animation */}
+      <section className="min-h-screen flex flex-col relative">
+        {/* Background - subtle grid that shifts with stage */}
         <div
-          className="absolute inset-0 transition-all duration-1000 opacity-20"
+          className="absolute inset-0 pointer-events-none transition-opacity duration-1000"
           style={{
-            background: `radial-gradient(ellipse at 50% 30%, ${stageColor}30 0%, transparent 60%)`,
+            opacity: stage === "chaos" ? 0.05 : 0.02,
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
+            backgroundSize: stage === "chaos" ? "40px 40px" : "60px 60px",
           }}
         />
 
-        {/* Header with logo */}
+        {/* Header - Logo and Navigation */}
         <header className="relative z-20 flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 relative">
-              <Image src="/logo-recognition.png" alt="re-cognition" fill className="object-contain" />
+            <div className="relative w-10 h-10">
+              <Image src="/logo-recognition.png" alt="re-cognition" fill className="object-contain" priority />
             </div>
-            <span className="text-white/70 font-light tracking-wider text-sm hidden sm:block">re-cognition</span>
+            <span className="text-sm font-light tracking-widest text-white/60">re-cognition</span>
           </div>
-          <Link
-            href="/start"
-            className="px-4 py-2 text-sm border border-white/20 rounded-full hover:bg-white/10 transition-colors"
+
+          {/* Play/Pause */}
+          <button
+            onClick={() => setIsPlaying(!isPlaying)}
+            className="text-white/40 hover:text-white/80 transition-colors text-xs font-mono"
           >
-            Start Your Case
-          </Link>
+            {isPlaying ? "PAUSE" : "PLAY"}
+          </button>
         </header>
 
-        {/* Main hero content */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
-          {/* Symbol progression bar */}
-          <div className="flex items-center gap-3 mb-8">
-            {STAGES.map((s, idx) => (
-              <button
-                key={s.id}
-                onClick={() => handleStageClick(idx)}
-                className="flex items-center gap-3 group"
-              >
-                {idx === 0 ? (
-                  <div
-                    className={`w-10 h-10 rounded-lg border-2 flex items-center justify-center transition-all duration-500 ${
-                      currentStage === 0 ? "border-white/60 bg-white/10" : "border-white/20"
-                    }`}
-                  >
-                    <span className="text-xs text-white/60">?</span>
-                  </div>
-                ) : (
+        {/* Symbol Progression - Top Navigation */}
+        <div className="relative z-20 flex items-center justify-center gap-1 md:gap-2 px-4 py-6">
+          {stages.map((s, idx) => {
+            const isActive = stage === s
+            const isPast = stages.indexOf(stage) > idx
+            const symbol = s === "chaos" ? "?" : NARRATIVE_CONTENT[s].symbol
+            const color = s === "chaos" ? SYMBOL_COLORS.chaos : SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS]
+
+            return (
+              <div key={s} className="flex items-center">
+                <button
+                  onClick={() => goToStage(s)}
+                  className={`relative flex flex-col items-center transition-all duration-500 ${
+                    isActive ? "scale-110" : "scale-100"
+                  }`}
+                >
+                  {/* Symbol */}
                   <span
                     className={`text-2xl md:text-3xl transition-all duration-500 ${
-                      currentStage === idx ? "scale-125" : "scale-100 opacity-40"
+                      isActive ? "opacity-100" : isPast ? "opacity-60" : "opacity-30"
                     }`}
                     style={{
-                      color: SYMBOL_COLORS[s.symbol as keyof typeof SYMBOL_COLORS],
-                      textShadow: currentStage === idx
-                        ? `0 0 30px ${SYMBOL_COLORS[s.symbol as keyof typeof SYMBOL_COLORS]}`
-                        : "none",
+                      color,
+                      textShadow: isActive ? `0 0 30px ${color}` : "none",
                     }}
                   >
-                    {s.symbol}
+                    {symbol}
                   </span>
-                )}
-                {idx < STAGES.length - 1 && (
+
+                  {/* Stage label */}
+                  <span
+                    className={`text-[10px] md:text-xs mt-1 transition-all duration-500 ${
+                      isActive ? "opacity-100" : "opacity-0"
+                    }`}
+                    style={{ color }}
+                  >
+                    {s === "chaos" ? "CHAOS" : NARRATIVE_CONTENT[s].label.toUpperCase()}
+                  </span>
+
+                  {/* Progress bar under active */}
+                  {isActive && (
+                    <div className="absolute -bottom-2 left-0 right-0 h-0.5 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full transition-all duration-100 rounded-full"
+                        style={{ width: `${stageProgress}%`, backgroundColor: color }}
+                      />
+                    </div>
+                  )}
+                </button>
+
+                {/* Connector line */}
+                {idx < stages.length - 1 && (
                   <div
-                    className={`w-6 md:w-12 h-0.5 transition-all duration-500 ${
-                      currentStage > idx ? "bg-white/50" : "bg-white/10"
+                    className={`w-6 md:w-12 h-px mx-1 md:mx-2 transition-all duration-500 ${
+                      isPast ? "bg-white/30" : "bg-white/10"
                     }`}
                   />
                 )}
-              </button>
-            ))}
-          </div>
-
-          {/* Stage title */}
-          <div className="text-center mb-6">
-            <h2
-              className="text-lg md:text-xl font-medium mb-1 transition-all duration-500"
-              style={{ color: stageColor }}
-            >
-              {stage.title}
-            </h2>
-            <p className="text-white/50 text-sm">{stage.subtitle}</p>
-          </div>
-
-          {/* Main transformation display */}
-          <div className="w-full max-w-4xl mx-auto relative" style={{ minHeight: "400px" }}>
-            {/* CHAOS STATE - The messy email */}
-            {currentStage === 0 && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="relative">
-                  {/* Overlapping document effect */}
-                  <div className="absolute -top-2 -left-2 w-full h-full bg-white/5 rounded-lg transform rotate-1" />
-                  <div className="absolute -top-1 -right-1 w-full h-full bg-white/5 rounded-lg transform -rotate-1" />
-                  
-                  {/* Main email */}
-                  <div className="relative bg-white/10 backdrop-blur border border-white/20 rounded-xl p-6 md:p-8">
-                    <div className="flex items-center gap-2 mb-4 pb-4 border-b border-white/10">
-                      <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center">
-                        <span className="text-red-400 text-xs">!</span>
-                      </div>
-                      <div>
-                        <p className="text-white/80 text-sm font-medium">RE: Information Request INF0013960</p>
-                        <p className="text-white/40 text-xs">Triple Zero Victoria</p>
-                      </div>
-                    </div>
-                    <pre className="text-white/70 text-sm leading-relaxed whitespace-pre-wrap font-sans">
-                      {CHAOS_EMAIL}
-                    </pre>
-                    
-                    {/* Confusion indicators */}
-                    <div className="mt-6 flex flex-wrap gap-2">
-                      {["Contradictory", "Vague", "No recourse?", "Privacy for whom?"].map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2 py-1 text-xs bg-red-500/20 text-red-300 rounded"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
-            )}
+            )
+          })}
+        </div>
 
-            {/* DOCUMENT STAGE - Extraction */}
-            {currentStage === 1 && stage.id === "document" && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="grid md:grid-cols-2 gap-6">
-                  {/* Faded email */}
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 opacity-40">
-                    <pre className="text-white/50 text-xs leading-relaxed whitespace-pre-wrap font-sans line-clamp-[12]">
-                      {CHAOS_EMAIL}
-                    </pre>
-                  </div>
-                  
-                  {/* Extracted data */}
-                  <div
-                    className="bg-black/40 border rounded-xl p-6"
-                    style={{ borderColor: `${SYMBOL_COLORS["●"]}50` }}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-3xl" style={{ color: SYMBOL_COLORS["●"] }}>●</span>
-                      <span className="text-white/60 text-sm tracking-wider">EVIDENCE EXTRACTED</span>
-                    </div>
-                    <div className="space-y-3">
-                      {stage.extract?.map((item, idx) => (
-                        <div
-                          key={item}
-                          className="flex items-center gap-3 animate-in slide-in-from-left duration-500"
-                          style={{ animationDelay: `${idx * 150}ms` }}
-                        >
-                          <div
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: SYMBOL_COLORS["●"] }}
-                          />
-                          <span className="text-white/80">{item}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* GROUND STAGE - Laws surface */}
-            {currentStage === 2 && stage.id === "ground" && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="grid gap-4 max-w-2xl mx-auto">
-                  {stage.laws?.map((law, idx) => (
+        {/* Main Stage Content */}
+        <div className="flex-1 flex items-center justify-center px-4 py-8">
+          <div className="w-full max-w-3xl">
+            {/* CHAOS STATE */}
+            {stage === "chaos" && (
+              <div className="relative h-[400px] md:h-[450px]">
+                {/* Chaotic overlapping documents */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {NARRATIVE_CONTENT.chaos.documents.map((doc, idx) => (
                     <div
-                      key={law.cite}
-                      className="bg-black/40 border rounded-xl p-5 animate-in slide-in-from-bottom duration-500"
+                      key={idx}
+                      className="absolute bg-white/5 border border-white/10 rounded-lg p-4 md:p-6 max-w-[280px] backdrop-blur-sm animate-in fade-in duration-700"
                       style={{
-                        borderColor: `${SYMBOL_COLORS["▼"]}50`,
+                        transform: `rotate(${doc.rotation}deg) translate(${doc.offset.x}px, ${doc.offset.y}px)`,
+                        animationDelay: `${idx * 150}ms`,
+                        zIndex: idx,
+                      }}
+                    >
+                      <p className="text-sm md:text-base text-white/60 font-mono">{doc.text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* "You received this..." label */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
+                  <p className="text-white/40 text-sm mb-2">{NARRATIVE_CONTENT.chaos.label}</p>
+                  <p className="text-white/20 text-xs">Confusing. Contradictory. Designed to exhaust.</p>
+                </div>
+              </div>
+            )}
+
+            {/* ● OBSERVE STATE */}
+            {stage === "observe" && (
+              <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <div
+                  className="inline-flex items-center justify-center w-20 h-20 md:w-24 md:h-24 rounded-full mb-6 animate-pulse"
+                  style={{
+                    backgroundColor: `${SYMBOL_COLORS["●"]}20`,
+                    boxShadow: `0 0 60px ${SYMBOL_COLORS["●"]}40`,
+                  }}
+                >
+                  <span className="text-5xl md:text-6xl" style={{ color: SYMBOL_COLORS["●"] }}>
+                    ●
+                  </span>
+                </div>
+
+                <h2 className="text-2xl md:text-3xl font-light mb-2" style={{ color: SYMBOL_COLORS["●"] }}>
+                  {NARRATIVE_CONTENT.observe.label}
+                </h2>
+                <p className="text-white/50 mb-8">{NARRATIVE_CONTENT.observe.subtitle}</p>
+
+                {/* Evidence card */}
+                <div
+                  className="inline-block bg-black/40 border rounded-xl p-6 text-left"
+                  style={{ borderColor: `${SYMBOL_COLORS["●"]}40` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <span className="text-2xl" style={{ color: SYMBOL_COLORS["●"] }}>
+                      ●
+                    </span>
+                    <div>
+                      <p className="text-xs text-white/40 font-mono mb-1">{NARRATIVE_CONTENT.observe.content.time}</p>
+                      <p className="text-white font-medium mb-1">{NARRATIVE_CONTENT.observe.content.evidence}</p>
+                      <p className="text-white/50 text-sm">{NARRATIVE_CONTENT.observe.content.location}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ▼ GROUND STATE */}
+            {stage === "ground" && (
+              <div className="text-center animate-in fade-in duration-700">
+                <span className="text-5xl md:text-6xl mb-4 inline-block" style={{ color: SYMBOL_COLORS["▼"] }}>
+                  ▼
+                </span>
+
+                <h2 className="text-2xl md:text-3xl font-light mb-2" style={{ color: SYMBOL_COLORS["▼"] }}>
+                  {NARRATIVE_CONTENT.ground.label}
+                </h2>
+                <p className="text-white/50 mb-8">{NARRATIVE_CONTENT.ground.subtitle}</p>
+
+                {/* Law cards rising */}
+                <div className="flex flex-col gap-3 max-w-md mx-auto">
+                  {NARRATIVE_CONTENT.ground.laws.map((law, idx) => (
+                    <div
+                      key={law.code}
+                      className="bg-black/40 border rounded-lg p-4 text-left animate-in slide-in-from-bottom-4 duration-500"
+                      style={{
+                        borderColor: `${SYMBOL_COLORS["▼"]}30`,
                         animationDelay: `${idx * 200}ms`,
                       }}
                     >
-                      <div className="flex items-start gap-4">
-                        <span className="text-2xl" style={{ color: SYMBOL_COLORS["▼"] }}>▼</span>
-                        <div>
-                          <p
-                            className="font-mono text-sm mb-1"
-                            style={{ color: SYMBOL_COLORS["▼"] }}
-                          >
-                            {law.cite}
-                          </p>
-                          <p className="text-white/80">{law.text}</p>
-                        </div>
-                      </div>
+                      <span
+                        className="text-xs font-mono px-2 py-1 rounded"
+                        style={{ backgroundColor: `${SYMBOL_COLORS["▼"]}20`, color: SYMBOL_COLORS["▼"] }}
+                      >
+                        {law.code}
+                      </span>
+                      <p className="text-white/70 text-sm mt-2">{law.text}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* RECOGNISE STAGE - Contradictions */}
-            {currentStage === 3 && stage.id === "recognise" && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="space-y-4 max-w-3xl mx-auto">
-                  {stage.contrasts?.map((c, idx) => (
+            {/* ▲ RECOGNISE STATE */}
+            {stage === "recognise" && (
+              <div className="text-center animate-in fade-in duration-700">
+                <span className="text-5xl md:text-6xl mb-4 inline-block" style={{ color: SYMBOL_COLORS["▲"] }}>
+                  ▲
+                </span>
+
+                <h2 className="text-2xl md:text-3xl font-light mb-2" style={{ color: SYMBOL_COLORS["▲"] }}>
+                  {NARRATIVE_CONTENT.recognise.label}
+                </h2>
+                <p className="text-white/50 mb-8">{NARRATIVE_CONTENT.recognise.subtitle}</p>
+
+                {/* Contrast cards */}
+                <div className="space-y-4 max-w-xl mx-auto">
+                  {NARRATIVE_CONTENT.recognise.contrasts.map((contrast, idx) => (
                     <div
-                      key={c.said}
-                      className="grid md:grid-cols-2 gap-3 animate-in slide-in-from-bottom duration-500"
-                      style={{ animationDelay: `${idx * 200}ms` }}
+                      key={idx}
+                      className="grid md:grid-cols-2 gap-3 animate-in slide-in-from-bottom-4 duration-500"
+                      style={{ animationDelay: `${idx * 300}ms` }}
                     >
-                      <div className="bg-red-950/30 border border-red-900/40 rounded-xl p-4">
-                        <p className="text-[10px] text-red-400/70 tracking-widest mb-2">THEY SAID</p>
-                        <p className="text-white/80 text-sm">{c.said}</p>
+                      <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-left">
+                        <p className="text-[10px] text-red-400/70 tracking-widest mb-1">THEY SAID</p>
+                        <p className="text-white/80 text-sm">{contrast.said}</p>
                       </div>
-                      <div className="bg-emerald-950/30 border border-emerald-900/40 rounded-xl p-4">
-                        <p className="text-[10px] text-emerald-400/70 tracking-widest mb-2">REALITY</p>
-                        <p className="text-white/80 text-sm">{c.reality}</p>
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-4 text-left">
+                        <p className="text-[10px] text-emerald-400/70 tracking-widest mb-1">REALITY</p>
+                        <p className="text-white/80 text-sm">{contrast.reality}</p>
                       </div>
                     </div>
                   ))}
@@ -317,138 +342,109 @@ export default function LandingPage() {
               </div>
             )}
 
-            {/* ACT STAGE - Ready actions */}
-            {currentStage === 4 && stage.id === "act" && (
-              <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-                  {stage.actions?.map((action, idx) => (
+            {/* ◼ ACT STATE */}
+            {stage === "act" && (
+              <div className="text-center animate-in fade-in duration-700">
+                <span className="text-5xl md:text-6xl mb-4 inline-block" style={{ color: SYMBOL_COLORS["◼"] }}>
+                  ◼
+                </span>
+
+                <h2 className="text-2xl md:text-3xl font-light mb-2" style={{ color: SYMBOL_COLORS["◼"] }}>
+                  {NARRATIVE_CONTENT.act.label}
+                </h2>
+                <p className="text-white/50 mb-8">{NARRATIVE_CONTENT.act.subtitle}</p>
+
+                {/* Action buttons */}
+                <div className="flex flex-wrap justify-center gap-3 mb-8">
+                  {NARRATIVE_CONTENT.act.actions.map((action, idx) => (
                     <div
-                      key={action}
-                      className="bg-black/40 border rounded-xl p-5 text-center animate-in zoom-in duration-500 hover:scale-105 transition-transform cursor-pointer"
+                      key={action.name}
+                      className="bg-black/40 border rounded-lg px-5 py-3 flex items-center gap-2 animate-in slide-in-from-bottom-4 duration-500"
                       style={{
-                        borderColor: `${SYMBOL_COLORS["◼"]}50`,
-                        animationDelay: `${idx * 100}ms`,
+                        borderColor: `${SYMBOL_COLORS["◼"]}40`,
+                        animationDelay: `${idx * 150}ms`,
                       }}
                     >
-                      <span
-                        className="text-3xl block mb-3"
-                        style={{ color: SYMBOL_COLORS["◼"] }}
-                      >
-                        ◼
-                      </span>
-                      <p className="text-white/80 text-sm font-medium">{action}</p>
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      <span className="text-white/80">{action.name}</span>
                     </div>
                   ))}
                 </div>
-                
-                {/* Final message */}
-                <p className="text-center text-white/50 mt-8 text-sm">
-                  From chaos to clarity in seconds.
-                </p>
               </div>
             )}
-          </div>
-
-          {/* Play/Pause and progress */}
-          <div className="mt-8 flex items-center gap-4">
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
-            >
-              {isPlaying ? (
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <rect x="6" y="4" width="4" height="16" />
-                  <rect x="14" y="4" width="4" height="16" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
-              )}
-            </button>
-            
-            {/* Progress bar */}
-            <div className="flex gap-1">
-              {STAGES.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleStageClick(idx)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    idx === currentStage ? "w-8 bg-white" : "w-4 bg-white/30 hover:bg-white/50"
-                  }`}
-                />
-              ))}
-            </div>
           </div>
         </div>
 
-        {/* Bottom CTA */}
-        <div className="relative z-10 pb-8 text-center">
+        {/* CTA - Fixed at bottom */}
+        <div className="relative z-20 flex flex-col items-center gap-3 px-4 py-8">
           <Link
             href="/start"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-medium hover:scale-105 transition-transform"
+            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full transition-all duration-300 hover:scale-105"
+            style={{
+              background:
+                stage === "chaos"
+                  ? "rgba(255,255,255,0.1)"
+                  : `linear-gradient(135deg, ${SYMBOL_COLORS[currentSymbol as keyof typeof SYMBOL_COLORS]}40, ${SYMBOL_COLORS[currentSymbol as keyof typeof SYMBOL_COLORS]}20)`,
+              border: `1px solid ${stage === "chaos" ? "rgba(255,255,255,0.2)" : SYMBOL_COLORS[currentSymbol as keyof typeof SYMBOL_COLORS]}40`,
+            }}
           >
-            <span className="flex gap-1">
-              {Object.entries(SYMBOL_COLORS).map(([symbol, color]) => (
-                <span key={symbol} style={{ color }} className="text-lg">
-                  {symbol}
-                </span>
-              ))}
+            <span
+              className="text-xl transition-transform group-hover:scale-110"
+              style={{ color: stage === "chaos" ? "#fff" : SYMBOL_COLORS[currentSymbol as keyof typeof SYMBOL_COLORS] }}
+            >
+              {stage === "chaos" ? "●" : currentSymbol}
             </span>
-            <span>Begin Your Case</span>
+            <span className="text-white font-medium">Begin Your Case</span>
           </Link>
-          <p className="text-white/30 text-xs mt-3">No account required</p>
+          <p className="text-white/30 text-xs">No account required</p>
         </div>
       </section>
 
-      {/* How it works - detailed */}
+      {/* How it works - Grid Section */}
       <section className="py-20 px-4 border-t border-white/10">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-center text-white/50 text-sm tracking-widest mb-4">THE TRANSFORMATION</h2>
-          <p className="text-center text-white/70 mb-12 max-w-2xl mx-auto">
-            Every confusing letter, every bureaucratic maze, every institutional barrier -
-            transformed into clarity and action.
-          </p>
+          <h2 className="text-center text-white/50 text-sm tracking-widest mb-12">THE JOURNEY</h2>
 
-          <div className="space-y-6">
-            {STAGES.slice(1).map((s, idx) => (
-              <div
-                key={s.id}
-                className="flex items-start gap-6 p-6 rounded-xl border border-white/10 hover:border-white/20 transition-colors"
-              >
-                <span
-                  className="text-4xl shrink-0"
-                  style={{ color: SYMBOL_COLORS[s.symbol as keyof typeof SYMBOL_COLORS] }}
+          <div className="grid md:grid-cols-2 gap-6">
+            {(["observe", "ground", "recognise", "act"] as const).map((s, idx) => {
+              const content = NARRATIVE_CONTENT[s]
+              const color = SYMBOL_COLORS[content.symbol as keyof typeof SYMBOL_COLORS]
+
+              return (
+                <button
+                  key={s}
+                  onClick={() => {
+                    goToStage(s)
+                    window.scrollTo({ top: 0, behavior: "smooth" })
+                  }}
+                  className="bg-white/5 border border-white/10 rounded-xl p-6 text-left hover:border-white/20 transition-all duration-300 group"
                 >
-                  {s.symbol}
-                </span>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-white/40 text-xs font-mono">0{idx + 1}</span>
-                    <h3
-                      className="text-xl font-medium"
-                      style={{ color: SYMBOL_COLORS[s.symbol as keyof typeof SYMBOL_COLORS] }}
-                    >
-                      {s.title}
-                    </h3>
+                  <div className="flex items-center gap-4 mb-3">
+                    <span className="text-3xl group-hover:scale-110 transition-transform" style={{ color }}>
+                      {content.symbol}
+                    </span>
+                    <div>
+                      <span className="text-white/40 text-xs font-mono">STEP {idx + 1}</span>
+                      <h3 className="text-lg font-medium text-white">{content.label}</h3>
+                    </div>
                   </div>
-                  <p className="text-white/60">{s.subtitle}</p>
-                </div>
-              </div>
-            ))}
+                  <p className="text-white/50 text-sm">{content.subtitle}</p>
+                </button>
+              )
+            })}
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 border-t border-white/10 bg-gradient-to-b from-transparent to-white/5">
+      <section className="py-20 px-4 border-t border-white/10">
         <div className="max-w-xl mx-auto text-center">
           <div className="flex justify-center gap-3 mb-6">
-            {Object.entries(SYMBOL_COLORS).map(([symbol, color]) => (
+            {["●", "▼", "▲", "◼"].map((symbol) => (
               <span
                 key={symbol}
-                className="text-3xl"
-                style={{ color, textShadow: `0 0 20px ${color}40` }}
+                className="text-2xl"
+                style={{ color: SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS] }}
               >
                 {symbol}
               </span>
@@ -457,13 +453,12 @@ export default function LandingPage() {
           <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-balance">
             Knowledge should not be the privilege of the few
           </h2>
-          <p className="text-white/50 mb-8">
-            Transform confusion into clarity. Document, ground, recognise, act.
-          </p>
+          <p className="text-white/50 mb-8">Transform confusion into clarity. Document, ground, recognise, act.</p>
           <Link
             href="/start"
             className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-white/90 transition-colors"
           >
+            <span style={{ color: SYMBOL_COLORS["●"] }}>●</span>
             Start Now
           </Link>
         </div>
