@@ -4,462 +4,354 @@ import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
-// Symbol colors - the four vertices of the recognition system
-const SYMBOL_COLORS = {
-  "●": "#9370DB", // OBI-WAN - Observer/Evidence - purple
-  "▼": "#FF8C00", // TATA - Law/Grounding - orange
-  "▲": "#FFD700", // ATLAS - Pattern/Intelligence - gold
-  "◼": "#0066CC", // DOJO - Action/Manifestation - blue
+// Symbol colors - the narrative palette
+const COLORS = {
+  purple: "#9370DB",  // ● Document - Observation
+  orange: "#FF8C00",  // ▼ Ground - Evidence  
+  gold: "#FFD700",    // ▲ Recognise - Pattern
+  blue: "#0066CC",    // ■ Act - Resolution
 }
 
-// Demo flow stages with richer content
-const DEMO_STAGES = [
-  {
-    symbol: "●",
-    title: "Observe",
-    subtitle: "Document the chaos",
-    description: "Drop your evidence. The system captures location, time, entities, and extracts the narrative thread from institutional confusion.",
-    example: {
-      input: "Confusing email from TZV about a 000 call...",
-      output: "Timeline extracted. 4 entities identified. 6 events mapped.",
-    },
-  },
-  {
-    symbol: "▼",
-    title: "Ground",
-    subtitle: "Surface your rights",
-    description: "Laws and precedents emerge automatically. What they told you versus what the legislation actually says.",
-    example: {
-      input: '"Privacy considerations apply..."',
-      output: "FOI Act s.33 | TZV Act s.29(2) - Subject access provisions",
-    },
-  },
-  {
-    symbol: "▲",
-    title: "Recognise",
-    subtitle: "See the pattern",
-    description: "Contradictions become visible. The narrative's internal logic is tested. Questions surface that illuminate what doesn't add up.",
-    example: {
-      input: '"Investigation revealed it was not your neighbours"',
-      output: "Yet: No phone number, only first name, cannot contact caller",
-    },
-  },
-  {
-    symbol: "◼",
-    title: "Act",
-    subtitle: "Manifest your response",
-    description: "Ready-to-send documents generated. FOI requests, formal responses, case records. Knowledge made actionable.",
-    example: {
-      input: "What can I do?",
-      output: "FOI Request ready | TZV Response drafted | Case page live",
-    },
-  },
-]
-
 export default function LandingPage() {
-  const [activeStage, setActiveStage] = useState(0)
-  const [isAnimating, setIsAnimating] = useState(true)
-  const [orbitAngle, setOrbitAngle] = useState(0)
+  const [scrollY, setScrollY] = useState(0)
+  const [hoveredSymbol, setHoveredSymbol] = useState<string | null>(null)
   const heroRef = useRef<HTMLDivElement>(null)
 
-  // Auto-cycle through demo stages
   useEffect(() => {
-    if (!isAnimating) return
-    const interval = setInterval(() => {
-      setActiveStage((prev) => (prev + 1) % DEMO_STAGES.length)
-    }, 4000)
-    return () => clearInterval(interval)
-  }, [isAnimating])
-
-  // Orbital animation for symbols
-  useEffect(() => {
-    const animate = () => {
-      setOrbitAngle((prev) => (prev + 0.3) % 360)
-    }
-    const interval = setInterval(animate, 50)
-    return () => clearInterval(interval)
+    const handleScroll = () => setScrollY(window.scrollY)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Get symbol position in orbit
-  const getOrbitPosition = (index: number, radius: number) => {
-    const baseAngle = (index * 90) + orbitAngle // 4 symbols, 90 degrees apart
-    const rad = (baseAngle * Math.PI) / 180
+  // Calculate symbol positions based on scroll
+  const getSymbolTransform = (index: number) => {
+    const progress = Math.min(scrollY / 400, 1)
+    const baseY = 0
+    const spreadY = index * 120 * progress
+    const spreadX = (index - 1.5) * 80 * progress
     return {
-      x: Math.cos(rad) * radius,
-      y: Math.sin(rad) * radius * 0.3, // Flatten for perspective
+      transform: `translate(${spreadX}px, ${baseY + spreadY}px) scale(${1 + progress * 0.2})`,
+      opacity: 0.3 + progress * 0.7,
     }
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-white overflow-hidden">
-      {/* Hero Section */}
-      <section ref={heroRef} className="min-h-screen flex flex-col items-center justify-center relative px-4 py-12">
-        {/* Dynamic background - responds to active stage */}
-        <div
-          className="absolute inset-0 pointer-events-none transition-all duration-1000"
+    <main className="min-h-[300vh] bg-[#050508] text-white">
+      {/* Hero - The Geometric Constellation */}
+      <section 
+        ref={heroRef}
+        className="h-screen sticky top-0 flex items-center justify-center overflow-hidden"
+      >
+        {/* Radial gradient backdrop */}
+        <div 
+          className="absolute inset-0 pointer-events-none"
           style={{
             background: `
-              radial-gradient(ellipse at 50% 30%, ${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}10 0%, transparent 50%),
-              radial-gradient(ellipse at 30% 70%, ${SYMBOL_COLORS["●"]}05 0%, transparent 40%),
-              radial-gradient(ellipse at 70% 60%, ${SYMBOL_COLORS["◼"]}05 0%, transparent 40%)
+              radial-gradient(ellipse 80% 50% at 50% 50%, ${COLORS.purple}08 0%, transparent 50%),
+              radial-gradient(ellipse 60% 40% at 30% 60%, ${COLORS.blue}05 0%, transparent 40%),
+              radial-gradient(ellipse 50% 30% at 70% 40%, ${COLORS.gold}05 0%, transparent 40%)
             `,
           }}
         />
 
-        {/* Geometric grid substrate */}
-        <div
-          className="absolute inset-0 pointer-events-none opacity-[0.02]"
-          style={{
-            backgroundImage: `
-              linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
-            `,
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        {/* Main content */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto">
-          {/* Central Logo with Orbiting Symbols */}
-          <div className="flex flex-col items-center mb-8 md:mb-12">
-            {/* Orbital system container */}
-            <div className="relative w-64 h-64 md:w-80 md:h-80 mb-6">
-              {/* Central logo */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="relative w-28 h-28 md:w-36 md:h-36">
-                  <Image
-                    src="/logo-recognition.png"
-                    alt="re-cognition"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-              </div>
-
-              {/* Orbital ring - faint */}
-              <svg className="absolute inset-0 w-full h-full" viewBox="-150 -150 300 300">
-                <ellipse
-                  cx="0"
-                  cy="0"
-                  rx="120"
-                  ry="40"
-                  fill="none"
-                  stroke="rgba(255,255,255,0.1)"
-                  strokeWidth="1"
-                  strokeDasharray="4,4"
-                />
-              </svg>
-
-              {/* Orbiting symbols */}
-              {DEMO_STAGES.map((stage, idx) => {
-                const pos = getOrbitPosition(idx, 120)
-                const isActive = activeStage === idx
-                return (
-                  <button
-                    key={stage.symbol}
-                    onClick={() => {
-                      setActiveStage(idx)
-                      setIsAnimating(false)
-                    }}
-                    className="absolute transition-all duration-300"
-                    style={{
-                      left: `calc(50% + ${pos.x}px)`,
-                      top: `calc(50% + ${pos.y}px)`,
-                      transform: "translate(-50%, -50%)",
-                      zIndex: pos.y > 0 ? 10 : 30, // Behind when at back of orbit
-                    }}
-                  >
-                    <span
-                      className={`block text-3xl md:text-4xl transition-all duration-500 ${
-                        isActive ? "scale-150" : "scale-100"
-                      }`}
-                      style={{
-                        color: SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS],
-                        textShadow: isActive
-                          ? `0 0 30px ${SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]}, 0 0 60px ${SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]}50`
-                          : `0 0 10px ${SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]}50`,
-                        opacity: isActive ? 1 : 0.6,
-                      }}
-                    >
-                      {stage.symbol}
-                    </span>
-                  </button>
-                )
-              })}
-
-              {/* Connection lines to active symbol */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="-150 -150 300 300">
-                {DEMO_STAGES.map((stage, idx) => {
-                  const pos = getOrbitPosition(idx, 120)
-                  const isActive = activeStage === idx
-                  return (
-                    <line
-                      key={`line-${stage.symbol}`}
-                      x1="0"
-                      y1="0"
-                      x2={pos.x}
-                      y2={pos.y}
-                      stroke={SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]}
-                      strokeWidth={isActive ? 2 : 0.5}
-                      strokeOpacity={isActive ? 0.6 : 0.1}
-                      className="transition-all duration-500"
-                    />
-                  )
-                })}
-              </svg>
+        {/* The central geometry - symbols arranged around logo */}
+        <div className="relative flex flex-col items-center">
+          {/* Logo at center */}
+          <div className="relative z-10 mb-8">
+            <div className="relative w-24 h-24 md:w-32 md:h-32">
+              <Image
+                src="/logo-recognition.png"
+                alt="re-cognition"
+                fill
+                className="object-contain"
+                priority
+              />
             </div>
-
-            {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-light tracking-[0.3em] text-white/90 mb-2">
-              re-cognition
-            </h1>
-            <p className="text-white/40 text-sm md:text-base text-center max-w-lg">
-              Transform institutional chaos into actionable clarity
-            </p>
           </div>
 
-          {/* Demo Flow Card - Enhanced */}
-          <div className="relative max-w-3xl mx-auto mb-10">
-            {/* Stage progress bar */}
-            <div className="flex items-center justify-center gap-1 mb-6">
-              {DEMO_STAGES.map((stage, idx) => (
-                <div key={stage.symbol} className="flex items-center">
-                  <button
-                    onClick={() => {
-                      setActiveStage(idx)
-                      setIsAnimating(false)
-                    }}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
-                      activeStage === idx
-                        ? "scale-110"
-                        : activeStage > idx
-                          ? "opacity-60"
-                          : "opacity-30"
-                    }`}
-                    style={{
-                      backgroundColor:
-                        activeStage >= idx
-                          ? `${SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]}20`
-                          : "transparent",
-                      border: `2px solid ${
-                        activeStage >= idx
-                          ? SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]
-                          : "rgba(255,255,255,0.1)"
-                      }`,
-                    }}
-                  >
-                    <span
-                      style={{
-                        color:
-                          activeStage >= idx
-                            ? SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS]
-                            : "rgba(255,255,255,0.3)",
-                      }}
-                    >
-                      {stage.symbol}
-                    </span>
-                  </button>
-                  {idx < DEMO_STAGES.length - 1 && (
-                    <div
-                      className="w-8 md:w-16 h-0.5 mx-1 transition-all duration-500"
-                      style={{
-                        backgroundColor:
-                          activeStage > idx
-                            ? SYMBOL_COLORS[DEMO_STAGES[idx + 1].symbol as keyof typeof SYMBOL_COLORS]
-                            : "rgba(255,255,255,0.1)",
-                      }}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Main demo card */}
-            <div
-              className="relative bg-black/40 backdrop-blur-xl border rounded-2xl overflow-hidden transition-all duration-500"
-              style={{
-                borderColor: `${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}40`,
-                boxShadow: `0 0 60px ${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}10`,
-              }}
+          {/* The four symbols - forming a constellation */}
+          <div className="relative h-[280px] w-[320px] md:h-[360px] md:w-[400px]">
+            {/* ● Document - Top */}
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 top-0 transition-all duration-700 cursor-pointer group"
+              onMouseEnter={() => setHoveredSymbol("document")}
+              onMouseLeave={() => setHoveredSymbol(null)}
             >
-              {/* Header */}
-              <div
-                className="px-6 py-4 border-b flex items-center gap-4"
-                style={{
-                  borderColor: `${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}20`,
-                  background: `linear-gradient(90deg, ${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}10 0%, transparent 100%)`,
-                }}
-              >
-                <span
-                  className="text-4xl"
-                  style={{
-                    color: SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS],
-                    textShadow: `0 0 20px ${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}`,
+              <div className="flex flex-col items-center">
+                <span 
+                  className="text-5xl md:text-6xl transition-all duration-500"
+                  style={{ 
+                    color: COLORS.purple,
+                    textShadow: hoveredSymbol === "document" ? `0 0 40px ${COLORS.purple}` : `0 0 20px ${COLORS.purple}40`,
+                    transform: hoveredSymbol === "document" ? "scale(1.2)" : "scale(1)",
                   }}
                 >
-                  {DEMO_STAGES[activeStage].symbol}
+                  ●
                 </span>
-                <div>
-                  <h3
-                    className="text-xl md:text-2xl font-semibold"
-                    style={{
-                      color: SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS],
-                    }}
-                  >
-                    {DEMO_STAGES[activeStage].title}
-                  </h3>
-                  <p className="text-white/50 text-sm">{DEMO_STAGES[activeStage].subtitle}</p>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <p className="text-white/70 leading-relaxed mb-6">
-                  {DEMO_STAGES[activeStage].description}
-                </p>
-
-                {/* Example visualization */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <p className="text-xs text-white/40 mb-2 font-mono">INPUT</p>
-                    <p className="text-white/60 text-sm font-mono">
-                      {DEMO_STAGES[activeStage].example.input}
-                    </p>
-                  </div>
-                  <div
-                    className="rounded-lg p-4 border"
-                    style={{
-                      backgroundColor: `${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}10`,
-                      borderColor: `${SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS]}30`,
-                    }}
-                  >
-                    <p
-                      className="text-xs mb-2 font-mono"
-                      style={{
-                        color: SYMBOL_COLORS[DEMO_STAGES[activeStage].symbol as keyof typeof SYMBOL_COLORS],
-                      }}
-                    >
-                      OUTPUT
-                    </p>
-                    <p className="text-white/80 text-sm font-mono">
-                      {DEMO_STAGES[activeStage].example.output}
-                    </p>
-                  </div>
-                </div>
+                <span 
+                  className={`text-xs tracking-widest mt-2 transition-all duration-300 ${
+                    hoveredSymbol === "document" ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ color: COLORS.purple }}
+                >
+                  DOCUMENT
+                </span>
               </div>
             </div>
+
+            {/* ▼ Ground - Left */}
+            <div 
+              className="absolute left-0 top-1/2 -translate-y-1/2 transition-all duration-700 cursor-pointer group"
+              onMouseEnter={() => setHoveredSymbol("ground")}
+              onMouseLeave={() => setHoveredSymbol(null)}
+            >
+              <div className="flex flex-col items-center">
+                <span 
+                  className="text-5xl md:text-6xl transition-all duration-500"
+                  style={{ 
+                    color: COLORS.orange,
+                    textShadow: hoveredSymbol === "ground" ? `0 0 40px ${COLORS.orange}` : `0 0 20px ${COLORS.orange}40`,
+                    transform: hoveredSymbol === "ground" ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  ▼
+                </span>
+                <span 
+                  className={`text-xs tracking-widest mt-2 transition-all duration-300 ${
+                    hoveredSymbol === "ground" ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ color: COLORS.orange }}
+                >
+                  GROUND
+                </span>
+              </div>
+            </div>
+
+            {/* ▲ Recognise - Right */}
+            <div 
+              className="absolute right-0 top-1/2 -translate-y-1/2 transition-all duration-700 cursor-pointer group"
+              onMouseEnter={() => setHoveredSymbol("recognise")}
+              onMouseLeave={() => setHoveredSymbol(null)}
+            >
+              <div className="flex flex-col items-center">
+                <span 
+                  className="text-5xl md:text-6xl transition-all duration-500"
+                  style={{ 
+                    color: COLORS.gold,
+                    textShadow: hoveredSymbol === "recognise" ? `0 0 40px ${COLORS.gold}` : `0 0 20px ${COLORS.gold}40`,
+                    transform: hoveredSymbol === "recognise" ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  ▲
+                </span>
+                <span 
+                  className={`text-xs tracking-widest mt-2 transition-all duration-300 ${
+                    hoveredSymbol === "recognise" ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ color: COLORS.gold }}
+                >
+                  RECOGNISE
+                </span>
+              </div>
+            </div>
+
+            {/* ■ Act - Bottom */}
+            <div 
+              className="absolute left-1/2 -translate-x-1/2 bottom-0 transition-all duration-700 cursor-pointer group"
+              onMouseEnter={() => setHoveredSymbol("act")}
+              onMouseLeave={() => setHoveredSymbol(null)}
+            >
+              <div className="flex flex-col items-center">
+                <span 
+                  className="text-5xl md:text-6xl transition-all duration-500"
+                  style={{ 
+                    color: COLORS.blue,
+                    textShadow: hoveredSymbol === "act" ? `0 0 40px ${COLORS.blue}` : `0 0 20px ${COLORS.blue}40`,
+                    transform: hoveredSymbol === "act" ? "scale(1.2)" : "scale(1)",
+                  }}
+                >
+                  ■
+                </span>
+                <span 
+                  className={`text-xs tracking-widest mt-2 transition-all duration-300 ${
+                    hoveredSymbol === "act" ? "opacity-100" : "opacity-0"
+                  }`}
+                  style={{ color: COLORS.blue }}
+                >
+                  ACT
+                </span>
+              </div>
+            </div>
+
+            {/* Connecting lines - SVG constellation */}
+            <svg 
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{ opacity: 0.15 }}
+            >
+              {/* Top to Left */}
+              <line x1="50%" y1="15%" x2="12%" y2="50%" stroke={COLORS.purple} strokeWidth="1" />
+              {/* Top to Right */}
+              <line x1="50%" y1="15%" x2="88%" y2="50%" stroke={COLORS.purple} strokeWidth="1" />
+              {/* Left to Bottom */}
+              <line x1="12%" y1="50%" x2="50%" y2="85%" stroke={COLORS.orange} strokeWidth="1" />
+              {/* Right to Bottom */}
+              <line x1="88%" y1="50%" x2="50%" y2="85%" stroke={COLORS.gold} strokeWidth="1" />
+              {/* Left to Right (through center) */}
+              <line x1="12%" y1="50%" x2="88%" y2="50%" stroke="white" strokeWidth="1" strokeDasharray="4,8" />
+            </svg>
+          </div>
+
+          {/* Title and tagline */}
+          <div className="text-center mt-8">
+            <h1 className="text-3xl md:text-4xl font-extralight tracking-[0.3em] text-white/90 mb-4">
+              re-cognition
+            </h1>
+            <p className="text-white/40 text-sm md:text-base max-w-sm mx-auto leading-relaxed">
+              From observation to action.<br/>
+              Your evidence, grounded in law.
+            </p>
           </div>
 
           {/* CTA */}
-          <div className="flex flex-col items-center gap-4">
-            <Link
-              href="/start"
-              className="group relative inline-flex items-center gap-4 px-10 py-5 rounded-full transition-all duration-300 hover:scale-105 overflow-hidden"
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.15)",
-              }}
+          <Link
+            href="/start"
+            className="mt-10 group relative"
+          >
+            <div 
+              className="px-8 py-4 rounded-full border border-white/20 bg-white/5 backdrop-blur-sm flex items-center gap-3 transition-all duration-300 group-hover:border-white/40 group-hover:bg-white/10"
             >
-              {/* Animated gradient background */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                style={{
-                  background: `linear-gradient(135deg, ${SYMBOL_COLORS["●"]}30, ${SYMBOL_COLORS["▼"]}30, ${SYMBOL_COLORS["▲"]}30, ${SYMBOL_COLORS["◼"]}30)`,
-                }}
-              />
-              
-              {/* Symbols */}
-              <div className="relative flex items-center gap-1">
-                {Object.entries(SYMBOL_COLORS).map(([symbol, color], idx) => (
-                  <span
-                    key={symbol}
-                    className="text-lg transition-all duration-300 group-hover:scale-110"
-                    style={{
-                      color,
-                      transitionDelay: `${idx * 50}ms`,
-                    }}
-                  >
-                    {symbol}
-                  </span>
-                ))}
-              </div>
-              
-              <span className="relative text-white font-medium text-lg">Begin Your Case</span>
-            </Link>
-
-            <p className="text-white/30 text-xs">
-              No account required. Your data stays with you.
-            </p>
-          </div>
+              <span 
+                className="text-xl transition-all duration-300 group-hover:scale-125"
+                style={{ color: COLORS.purple }}
+              >
+                ●
+              </span>
+              <span className="text-white/80 group-hover:text-white transition-colors">
+                Begin
+              </span>
+            </div>
+          </Link>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Scroll hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-white/30 text-xs tracking-wider">THE JOURNEY</span>
-          <div className="w-px h-8 bg-gradient-to-b from-white/30 to-transparent" />
+          <div className="w-px h-12 bg-gradient-to-b from-transparent via-white/20 to-transparent" />
         </div>
       </section>
 
-      {/* How it works section */}
-      <section className="py-20 px-4 border-t border-white/10">
+      {/* The Journey - Visual narrative */}
+      <section className="relative py-32 px-4">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-center text-white/50 text-sm tracking-widest mb-12">
-            THE JOURNEY
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {DEMO_STAGES.map((stage, idx) => (
-              <div
-                key={stage.symbol}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 hover:border-white/20 transition-all duration-300"
+          {/* Stage 1: Document */}
+          <div className="flex items-start gap-8 mb-32">
+            <div className="shrink-0">
+              <span 
+                className="text-6xl md:text-7xl"
+                style={{ color: COLORS.purple, textShadow: `0 0 30px ${COLORS.purple}40` }}
               >
-                <div className="flex items-center gap-4 mb-4">
-                  <span
-                    className="text-3xl"
-                    style={{ color: SYMBOL_COLORS[stage.symbol as keyof typeof SYMBOL_COLORS] }}
-                  >
-                    {stage.symbol}
-                  </span>
-                  <div>
-                    <span className="text-white/40 text-xs font-mono">STEP {idx + 1}</span>
-                    <h3 className="text-lg font-medium text-white">{stage.title}</h3>
-                  </div>
-                </div>
-                <p className="text-white/60 text-sm leading-relaxed mb-4">
-                  {stage.description}
-                </p>
-                <div className="bg-black/30 rounded px-3 py-2 text-xs font-mono text-white/50">
-                  {stage.example}
-                </div>
-              </div>
-            ))}
+                ●
+              </span>
+            </div>
+            <div className="pt-2">
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
+                Document what happened
+              </h2>
+              <p className="text-white/50 leading-relaxed text-lg">
+                Drop the email, the letter, the notice. Capture where you are. 
+                The system observes - extracting dates, entities, claims, contradictions.
+              </p>
+            </div>
+          </div>
+
+          {/* Stage 2: Ground */}
+          <div className="flex items-start gap-8 mb-32 md:ml-16">
+            <div className="shrink-0">
+              <span 
+                className="text-6xl md:text-7xl"
+                style={{ color: COLORS.orange, textShadow: `0 0 30px ${COLORS.orange}40` }}
+              >
+                ▼
+              </span>
+            </div>
+            <div className="pt-2">
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
+                Ground in law
+              </h2>
+              <p className="text-white/50 leading-relaxed text-lg">
+                Relevant legislation surfaces automatically. Not generic legal advice - 
+                specific provisions that apply to your exact situation.
+              </p>
+            </div>
+          </div>
+
+          {/* Stage 3: Recognise */}
+          <div className="flex items-start gap-8 mb-32 md:ml-32">
+            <div className="shrink-0">
+              <span 
+                className="text-6xl md:text-7xl"
+                style={{ color: COLORS.gold, textShadow: `0 0 30px ${COLORS.gold}40` }}
+              >
+                ▲
+              </span>
+            </div>
+            <div className="pt-2">
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
+                Recognise the pattern
+              </h2>
+              <p className="text-white/50 leading-relaxed text-lg">
+                What they said versus what is. Contradictions made visible. 
+                The questions that matter, articulated clearly.
+              </p>
+            </div>
+          </div>
+
+          {/* Stage 4: Act */}
+          <div className="flex items-start gap-8 md:ml-48">
+            <div className="shrink-0">
+              <span 
+                className="text-6xl md:text-7xl"
+                style={{ color: COLORS.blue, textShadow: `0 0 30px ${COLORS.blue}40` }}
+              >
+                ■
+              </span>
+            </div>
+            <div className="pt-2">
+              <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
+                Act with clarity
+              </h2>
+              <p className="text-white/50 leading-relaxed text-lg">
+                FOI requests, formal responses, ombudsman complaints - 
+                ready to send. A permanent record that cannot be unseen.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 px-4 border-t border-white/10">
+      <section className="py-32 px-4 border-t border-white/5">
         <div className="max-w-xl mx-auto text-center">
-          <div className="flex justify-center gap-2 mb-6">
-            {Object.entries(SYMBOL_COLORS).map(([symbol, color]) => (
-              <span key={symbol} className="text-2xl" style={{ color }}>
-                {symbol}
-              </span>
-            ))}
+          {/* Symbol sequence */}
+          <div className="flex justify-center items-center gap-4 mb-8">
+            <span className="text-3xl" style={{ color: COLORS.purple }}>●</span>
+            <span className="w-8 h-px bg-white/20" />
+            <span className="text-3xl" style={{ color: COLORS.orange }}>▼</span>
+            <span className="w-8 h-px bg-white/20" />
+            <span className="text-3xl" style={{ color: COLORS.gold }}>▲</span>
+            <span className="w-8 h-px bg-white/20" />
+            <span className="text-3xl" style={{ color: COLORS.blue }}>■</span>
           </div>
-          <h2 className="text-2xl md:text-3xl font-light text-white mb-4">
-            Knowledge should not be the privilege of the few
+
+          <h2 className="text-2xl md:text-3xl font-extralight text-white mb-6 leading-relaxed">
+            Knowledge should not be<br/>the privilege of the few
           </h2>
-          <p className="text-white/50 mb-8">
-            Transform confusion into clarity. Document, ground, recognise, act.
-          </p>
+          
           <Link
             href="/start"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-white/90 transition-colors"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-white text-[#050508] rounded-full font-medium hover:bg-white/90 transition-all duration-300 hover:scale-105"
           >
-            <span style={{ color: SYMBOL_COLORS["●"] }}>●</span>
-            Start Now
+            <span style={{ color: COLORS.purple }}>●</span>
+            Begin Your Case
           </Link>
         </div>
       </section>
