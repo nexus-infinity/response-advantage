@@ -78,15 +78,29 @@ function extractInsight(synthesis: any): string {
   return `Insight derived from ${SYMBOLS.S3_OBS}${SYMBOLS.S3_TEMP}${SYMBOLS.S3_PATTERN} vertices`
 }
 
+/**
+ * Calculate confidence based on vertex completeness
+ * 
+ * Checks that all three required vertices (observation, temporal, pattern)
+ * are present and contain data.
+ */
 function calculateConfidence(synthesis: any): number {
-  // Calculate confidence based on vertex agreement
-  // In a full implementation, this would compare vertex outputs
-  // For now, return high confidence if all vertices present
-  const vertexCount = Object.keys(synthesis).filter(k => 
-    k.includes('pattern') || k.includes('temporal') || k.includes('evidence')
-  ).length
+  // Verify all required vertices are present with data
+  const hasObservation = synthesis.grounded_evidence && 
+    Object.keys(synthesis.grounded_evidence).length > 0
+  const hasTemporal = synthesis.temporal_context && 
+    Object.keys(synthesis.temporal_context).length > 0
+  const hasPattern = synthesis.core_pattern && 
+    Object.keys(synthesis.core_pattern).length > 0
   
-  return Math.min(vertexCount / 3, 1.0)
+  // Count present vertices
+  let vertexCount = 0
+  if (hasObservation) vertexCount++
+  if (hasTemporal) vertexCount++
+  if (hasPattern) vertexCount++
+  
+  // Calculate confidence (all 3 vertices = 100% confidence)
+  return vertexCount / 3
 }
 
 /**

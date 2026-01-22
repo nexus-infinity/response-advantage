@@ -31,7 +31,7 @@ export const FREQUENCIES = {
 
 // Golden Ratio (φ) and critical points
 export const PHI = 1.618033988749895
-export const PHI_INVERSE = 0.618033988749895  // 61.8%
+export const PHI_INVERSE = 1 / PHI  // 0.618... calculated for precision
 export const SPIN_REVERSAL_POINT = 1 - PHI_INVERSE // 38.2% - CRITICAL
 
 // Coherence threshold (S1 validation)

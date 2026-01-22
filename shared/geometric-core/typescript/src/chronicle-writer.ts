@@ -61,11 +61,11 @@ export async function writeChronicle(entry: ChronicleEntry): Promise<void> {
     timestamp,
   }
   
-  // Append to JSONL file
+  // Append to JSONL file (async)
   const line = JSON.stringify(completeEntry) + '\n'
   
   try {
-    fs.appendFileSync(logFile, line, 'utf-8')
+    await fs.promises.appendFile(logFile, line, 'utf-8')
   } catch (error) {
     console.error('Failed to write to Chronicle:', error)
     // Don't throw - Chronicle logging should never break the pipeline

@@ -21,6 +21,10 @@ export interface S1Output {
   timestamp: string
 }
 
+// Coherence calculation thresholds
+const MIN_TEXT_LENGTH = 10  // Minimum characters for meaningful content
+const BASE_COHERENCE_SCORE = 0.5  // Score for basic content presence
+
 /**
  * Calculate coherence score
  * 
@@ -34,12 +38,12 @@ function calculateCoherence(input: any): number {
   if (typeof input === 'string') {
     // For text, use basic heuristics
     const length = input.length
-    const hasContent = length > 10
+    const hasContent = length > MIN_TEXT_LENGTH
     const hasStructure = /[.!?]/.test(input)
     
     let score = 0
-    if (hasContent) score += 0.5
-    if (hasStructure) score += 0.5
+    if (hasContent) score += BASE_COHERENCE_SCORE
+    if (hasStructure) score += BASE_COHERENCE_SCORE
     
     return score
   }
@@ -51,13 +55,13 @@ function calculateCoherence(input: any): number {
     const hasMultipleFields = keys.length > 2
     
     let score = 0
-    if (hasData) score += 0.5
-    if (hasMultipleFields) score += 0.5
+    if (hasData) score += BASE_COHERENCE_SCORE
+    if (hasMultipleFields) score += BASE_COHERENCE_SCORE
     
     return score
   }
   
-  return 0.5 // Default moderate coherence
+  return BASE_COHERENCE_SCORE // Default moderate coherence
 }
 
 /**
