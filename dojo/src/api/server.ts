@@ -19,17 +19,21 @@ const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
 
 // Detects rhetorical postponement patterns
 const CAN_KICKING_PATTERNS: readonly RegExp[] = [
-  // Single-word verbs (excluding "revisit" to avoid duplication with "revisit later" below)
+  // Single-word verbs with future temporal modifiers (note: "table" here requires temporal words like "later")
   /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|handle|discuss|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
   // Multi-word verb: "deal with"
   /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
   // Multi-word verb: "circle back"
   /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-  // Standalone postponement phrases (more specific pattern for "put...on")
-  /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put(?:\s+\w+){0,5}\s+on (hold|ice|the back burner))\b/gi,
+  // Timing objections
+  /\b(not (the right|a good) time|premature|too early)\b/gi,
+  // Revisit/park patterns
+  /\b(revisit later|park (this|that|it))\b/gi,
+  // Put on hold/ice/back burner (constrained to 0-5 words between "put" and "on")
+  /\bput(?:\s+\w+){0,5}\s+on (hold|ice|the back burner)\b/gi,
   // Direct postponement verbs
   /\b(defer|postpone|delay|punt|kick the can)\b/gi,
-  // Table as verb
+  // Table as direct verb (without requiring temporal modifiers)
   /\btable (this|that|the discussion|the decision)\b/gi,
   // Circle back standalone
   /\bcircle back\b/gi
