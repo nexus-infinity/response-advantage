@@ -14,6 +14,8 @@ app.get('/health', (c) => c.json({
 
 // Pattern #47: Can Kicking Detection
 // Detects rhetorical postponement patterns
+// Weight assigned per pattern match when calculating confidence (0.0 to 1.0)
+// With 0.3, confidence reaches 1.0 after ~4 matches, balancing sensitivity and specificity
 const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
 
 function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
