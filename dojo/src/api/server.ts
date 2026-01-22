@@ -16,7 +16,12 @@ app.get('/health', (c) => c.json({
 // Detects rhetorical postponement patterns
 function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
   const canKickingPatterns = [
-    /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|deal with|handle|discuss|revisit|circle back|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+    // Single-word verbs
+    /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|handle|discuss|revisit|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+    // Multi-word verb: "deal with"
+    /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+    // Multi-word verb: "circle back"
+    /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
     /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*on (hold|ice|the back burner))\b/gi,
     /\b(defer|postpone|delay|punt|kick the can)\b/gi,
     /\btable (this|that|the discussion|the decision)\b/gi,
