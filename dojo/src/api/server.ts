@@ -46,6 +46,14 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
 app.post('/api/v1/dialectic', async (c) => {
   const { input } = await c.req.json()
 
+  // Validate input
+  if (!input || typeof input !== 'string') {
+    return c.json({
+      status: 'error',
+      message: 'Invalid input: expected a non-empty string'
+    }, 400)
+  }
+
   // Pattern #47 "Can Kicking" detection
   const canKickingResult = detectCanKicking(input)
 
