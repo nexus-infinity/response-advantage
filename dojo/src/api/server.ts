@@ -14,8 +14,6 @@ app.get('/health', (c) => c.json({
 
 // Pattern #47: Can Kicking Detection
 // Detects rhetorical postponement patterns
-// Weight assigned per pattern match when calculating confidence (0.0 to 1.0)
-// With 0.3, confidence reaches 1.0 after ~4 matches, balancing sensitivity and specificity
 const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
 
 function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
@@ -26,7 +24,7 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
     /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
     // Multi-word verb: "circle back"
     /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*on (hold|ice|the back burner))\b/gi,
+    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*?on (hold|ice|the back burner))\b/gi,
     /\b(defer|postpone|delay|punt|kick the can)\b/gi,
     /\btable (this|that|the discussion|the decision)\b/gi,
     /\bcircle back\b/gi
@@ -49,6 +47,11 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
 
 app.post('/api/v1/dialectic', async (c) => {
   const { input } = await c.req.json()
+
+  // Validate input field
+  if (input === undefined || input === null || typeof input !== 'string') {
+    return c.json({ error: 'Invalid input: must be a string' }, 400)
+  }
 
   // Pattern #47 "Can Kicking" detection
   const canKickingResult = detectCanKicking(input)
