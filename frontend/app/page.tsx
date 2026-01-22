@@ -75,12 +75,13 @@ export default function Home() {
 
         {/* Footer */}
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row mt-16">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-black transition-colors hover:bg-zinc-200 md:w-[200px]"
-            href="#"
+          <button
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-6 text-black transition-colors hover:bg-zinc-200 md:w-[200px] cursor-not-allowed opacity-75"
+            disabled
+            title="Coming soon"
           >
             Begin Journey
-          </a>
+          </button>
           <a
             className="flex h-12 w-full items-center justify-center rounded-full border border-zinc-700 px-6 transition-colors hover:border-white hover:bg-zinc-900 md:w-[200px] text-zinc-300"
             href="https://github.com/nexus-infinity/response-advantage"
