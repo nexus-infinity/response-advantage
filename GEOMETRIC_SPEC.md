@@ -233,6 +233,45 @@ npm run check:alignment
 
 ---
 
+## Healing Architecture Integration
+
+### Alchemical → Psychological → Geometric Mapping
+
+The S0→S7 geometric process maps directly to alchemical transformation stages and psychological healing:
+
+| Alchemy | Psychology | Geometric | Symbol | Healing Outcome |
+|---------|------------|-----------|--------|-----------------|
+| **Nigredo** (Blackening) | **Acknowledgement** | S0 | ◻ | "This happened. I'm not making it up." |
+| **Albedo** (Purification) | **Validation** | S1-S2 | 🔷🎭 | "The law says you were wronged." |
+| **Citrinitas** (Awakening) | **Pattern Recognition** | S3-S4 | ●▼▲◼ | "This wasn't random. It's a pattern." |
+| **Rubedo** (Integration) | **Empowerment** | S5-S7 | 🧠●👑 | "I can do something about this." |
+
+### King's Chamber as Psychological Breakthrough
+
+**S4 King's Chamber (φ⁻¹ = 38.2%)** is not just a geometric spin reversal—it's a **psychological transformation gate**:
+
+**Physical Mechanism:**
+- Destructive interference dampens "standing waves" (repetitive trauma loops)
+- Spin reversal from clockwise (expansion) to counterclockwise (contraction)
+- Frequency: 741 Hz (SOL - Awakening Intuition)
+
+**Psychological Experience:**
+- **Before:** "I'm confused, maybe I'm wrong, maybe I'm crazy"
+- **The Silence:** Noise cancellation enables clarity
+- **After:** "94% confidence: Pattern #47. You were systematically obstructed."
+
+**Platform Manifestation:**
+- Pattern crystallizes from chaos
+- Similar cases revealed
+- Timeline visualization of systematic behavior
+- User realizes: "I'm not alone. This is systemic."
+
+**This is trauma resolution through geometric proof.**
+
+See **[HEALING_ARCHITECTURE.md](./HEALING_ARCHITECTURE.md)** for complete documentation.
+
+---
+
 ## Version
 
 - **Specification Version**: 1.0.0
