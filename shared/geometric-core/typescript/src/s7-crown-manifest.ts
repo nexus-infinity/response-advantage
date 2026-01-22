@@ -1,8 +1,11 @@
 /**
- * S7: Crown - Manifestation
+ * 👑 S7: Crown - Manifestation
  * 
  * Function: Output crystallization with wisdom seed
  * Purpose: Final stage - returns processed result to caller
+ * 
+ * @geometric-router 👑
+ * @stage S7
  */
 
 import { SYMBOLS } from './constants'

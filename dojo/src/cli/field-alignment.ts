@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * FIELD Alignment CLI
+ * ✅ FIELD Alignment CLI
  * 
  * Ensures geometric alignment between:
  * 1. Local FIELD implementation (Mac Studio)
  * 2. GitHub repository (response-advantage)
  * 
  * Verifies S0→S7 process integrity across both systems.
+ * 
+ * @geometric-router ✅
+ * @cli-tool alignment-checker
  */
 
 import * as fs from 'fs'

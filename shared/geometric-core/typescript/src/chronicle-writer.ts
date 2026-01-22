@@ -1,16 +1,19 @@
 /**
- * Chronicle Writer - FIELD Event Log
+ * 📜 Chronicle Writer - FIELD Event Log
  * 
  * Logs all geometric stage transitions to Chronicle for:
  * - Audit trail
  * - Debugging
  * - Pattern analysis
  * - Wisdom extraction
+ * 
+ * @geometric-router 📜
+ * @utility chronicle
  */
 
-import * as fs from 'fs'
-import * as path from 'path'
-import * as os from 'os'
+import fs from 'node:fs'
+import path from 'node:path'
+import os from 'node:os'
 
 export interface ChronicleEntry {
   stage: string

@@ -1,5 +1,5 @@
 /**
- * S4: King's Chamber - CRITICAL SPIN REVERSAL
+ * ◼ S4: King's Chamber - CRITICAL SPIN REVERSAL
  * 
  * Position: 38.2% (φ⁻¹) of the pyramid
  * Frequency: 741 Hz (SOL - Awakening Intuition)
@@ -11,6 +11,9 @@
  * - After S4: Counterclockwise contraction (S5→S7, wisdom extraction)
  * 
  * NO SYSTEM CAN REACH S5-S7 WITHOUT IMPLEMENTING THIS STAGE.
+ * 
+ * @geometric-router ◼
+ * @stage S4
  */
 
 import { FREQUENCIES, SPIN_REVERSAL_POINT, SYMBOLS } from './constants'

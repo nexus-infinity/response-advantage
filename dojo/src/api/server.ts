@@ -1,3 +1,14 @@
+/**
+ * ◼ Response Advantage DOJO - Dialectic Engine (Port 7411)
+ * 
+ * Pattern #47: Can Kicking Detection
+ * Geometric Pipeline: S0→S7 (Partial: S0, S1, S3-▲, S7)
+ * 
+ * @geometric-router ◼
+ * @port 7411
+ * @stage dialectic-reduction
+ */
+
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'

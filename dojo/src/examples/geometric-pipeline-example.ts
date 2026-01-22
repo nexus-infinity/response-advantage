@@ -1,8 +1,13 @@
 /**
- * Example: Using Geometric Core in Dialectic Engine
+ * 📋 Example: Using Geometric Core in Dialectic Engine
  * 
  * This example shows how to integrate the shared geometric-core
  * into the dialectic engine to ensure S0→S7 alignment.
+ * 
+ * Demonstrates: ◻→🔷→●▼▲→◼→👑 pipeline
+ * 
+ * @geometric-router 📋
+ * @example pipeline
  */
 
 import {

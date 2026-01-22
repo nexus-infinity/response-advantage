@@ -1,7 +1,10 @@
 /**
- * Geometric Constants - FIELD Architecture
+ * ⚙️ Geometric Constants - FIELD Architecture
  * 
  * Canonical frequencies, ratios, and symbols for S0→S7 process
+ * 
+ * @geometric-router ⚙️
+ * @module constants
  */
 
 // Geometric Symbols

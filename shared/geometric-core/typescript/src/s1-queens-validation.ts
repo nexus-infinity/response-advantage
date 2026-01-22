@@ -1,8 +1,11 @@
 /**
- * S1: Queen's Chamber - Validation
+ * 🔷 S1: Queen's Chamber - Validation
  * 
  * Function: Coherence ≥ 0.70 threshold
  * Purpose: Filter out low-quality inputs before expensive processing
+ * 
+ * @geometric-router 🔷
+ * @stage S1
  */
 
 import { COHERENCE_THRESHOLD, SYMBOLS } from './constants'

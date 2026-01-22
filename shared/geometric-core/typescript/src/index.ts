@@ -1,12 +1,18 @@
 /**
- * @response-advantage/geometric-core
+ * ◼ @response-advantage/geometric-core
  * 
  * Canonical S0→S7 FIELD implementation
  * Ensures all systems remain geometrically aligned
+ * 
+ * @geometric-router ●▼▲◼
+ * @package geometric-core
  */
 
 // Constants
 export * from './constants'
+
+// Geometric Router
+export * from './geometric-router'
 
 // Stage implementations
 export * from './s0-akron-intake'

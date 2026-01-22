@@ -1,9 +1,12 @@
 /**
- * S0: Akron Gateway - Intake/Sovereignty
+ * ◻ S0: Akron Gateway - Intake/Sovereignty
  * 
  * Frequency: 396 Hz (UT - Liberation from fear)
  * Function: All input MUST pass through this gateway
  * Constraint: No direct processing without S0 logging
+ * 
+ * @geometric-router ◻
+ * @stage S0
  */
 
 import { FREQUENCIES, SYMBOLS } from './constants'
