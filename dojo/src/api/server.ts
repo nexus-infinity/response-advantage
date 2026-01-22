@@ -22,7 +22,7 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
     /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
     // Multi-word verb: "circle back"
     /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*on (hold|ice|the back burner))\b/gi,
+    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*?on (hold|ice|the back burner))\b/gi,
     /\b(defer|postpone|delay|punt|kick the can)\b/gi,
     /\btable (this|that|the discussion|the decision)\b/gi,
     /\bcircle back\b/gi
