@@ -13,6 +13,8 @@ app.get('/health', (c) => c.json({
 }))
 
 // Pattern #47: Can Kicking Detection
+const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
+
 // Detects rhetorical postponement patterns
 const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
 
