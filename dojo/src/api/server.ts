@@ -13,34 +13,51 @@ app.get('/health', (c) => c.json({
 }))
 
 // Pattern #47: Can Kicking Detection
+
+// Weight applied per match when calculating confidence score (0.3 means ~3-4 matches = high confidence)
 const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
 
 // Detects rhetorical postponement patterns
-const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
+const CAN_KICKING_PATTERNS: readonly RegExp[] = [
+  // Single-word verbs with future temporal modifiers (note: "table" here requires temporal words like "later")
+  /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|handle|discuss|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+  // Multi-word verb: "deal with"
+  /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+  // Multi-word verb: "circle back"
+  /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
+  // Timing objections
+  /\b(not (the right|a good) time|premature|too early)\b/gi,
+  // Revisit/park patterns
+  /\b(revisit later|park (this|that|it))\b/gi,
+  // Put on hold/ice/back burner (constrained to 0-5 words between "put" and "on")
+  /\bput(?:\s+\w+){0,5}\s+on (hold|ice|the back burner)\b/gi,
+  // Direct postponement verbs
+  /\b(defer|postpone|delay|punt|kick the can)\b/gi,
+  // Table as direct verb (without requiring temporal modifiers)
+  /\btable (this|that|the discussion|the decision)\b/gi,
+  // Circle back standalone
+  /\bcircle back\b/gi
+]
 
-function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
-  const canKickingPatterns = [
-    // Single-word verbs
-    /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|handle|discuss|revisit|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    // Multi-word verb: "deal with"
-    /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    // Multi-word verb: "circle back"
-    /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*?on (hold|ice|the back burner))\b/gi,
-    /\b(defer|postpone|delay|punt|kick the can)\b/gi,
-    /\btable (this|that|the discussion|the decision)\b/gi,
-    /\bcircle back\b/gi
-  ]
+interface CanKickingResult {
+  detected: boolean
+  matches: string[]
+  confidence: number
+}
 
-  const matches: string[] = []
+function detectCanKicking(text: string): CanKickingResult {
+  const matchSet = new Set<string>()
 
-  for (const pattern of canKickingPatterns) {
+  for (const pattern of CAN_KICKING_PATTERNS) {
     const found = text.match(pattern)
     if (found) {
-      matches.push(...found)
+      for (const match of found) {
+        matchSet.add(match)
+      }
     }
   }
 
+  const matches = Array.from(matchSet)
   const detected = matches.length > 0
   const confidence = Math.min(matches.length * CONFIDENCE_WEIGHT_PER_MATCH, 1.0)
 
