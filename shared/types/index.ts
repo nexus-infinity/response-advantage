@@ -1,3 +1,12 @@
+/**
+ * 📐 Shared Types - Response Advantage
+ * 
+ * Type definitions for dialectic reduction and geometric routing
+ * 
+ * @geometric-router 📐
+ * @module types
+ */
+
 export interface DialecticInput {
   text: string
   context?: string

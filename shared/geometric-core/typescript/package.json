@@ -1,0 +1,28 @@
+{
+  "name": "@response-advantage/geometric-core",
+  "version": "0.1.0",
+  "description": "Canonical S0→S7 FIELD implementation for geometric alignment",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "field",
+    "geometric",
+    "s0-s7",
+    "spinning-top",
+    "dialectic"
+  ],
+  "author": "Nexus Infinity",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "typescript": "^5.7.2",
+    "vitest": "^4.0.17"
+  }
+}
