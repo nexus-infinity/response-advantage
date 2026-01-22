@@ -49,8 +49,8 @@ app.post('/api/v1/dialectic', async (c) => {
   const { input } = await c.req.json()
 
   // Validate input field
-  if (!input || typeof input !== 'string') {
-    return c.json({ error: 'Invalid input: must be a non-empty string' }, 400)
+  if (input === undefined || input === null || typeof input !== 'string') {
+    return c.json({ error: 'Invalid input: must be a string' }, 400)
   }
 
   // Pattern #47 "Can Kicking" detection
