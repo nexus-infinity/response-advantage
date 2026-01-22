@@ -15,6 +15,8 @@ app.get('/health', (c) => c.json({
 // Pattern #47: Can Kicking Detection
 // Detects rhetorical postponement patterns
 function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
+  const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
+  
   const canKickingPatterns = [
     // Single-word verbs
     /\b(we'?ll|let'?s|can|should|might|could)\s+(address|tackle|handle|discuss|revisit|table)\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
@@ -38,7 +40,7 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
   }
 
   const detected = matches.length > 0
-  const confidence = Math.min(matches.length * 0.3, 1.0)
+  const confidence = Math.min(matches.length * CONFIDENCE_WEIGHT_PER_MATCH, 1.0)
 
   return { detected, matches, confidence }
 }
