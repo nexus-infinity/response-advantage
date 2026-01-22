@@ -14,6 +14,8 @@ app.get('/health', (c) => c.json({
 
 // Pattern #47: Can Kicking Detection
 // Detects rhetorical postponement patterns
+const CONFIDENCE_WEIGHT_PER_MATCH = 0.3
+
 function detectCanKicking(text: string): { detected: boolean; matches: string[]; confidence: number } {
   const canKickingPatterns = [
     // Single-word verbs
@@ -22,7 +24,7 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
     /\b(we'?ll|let'?s|can|should|might|could)\s+deal with\s+(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
     // Multi-word verb: "circle back"
     /\b(we'?ll|let'?s|can|should|might|could)\s+circle back\s+(to\s+)?(this|that|it)\s+(later|another time|next time|in the future|down the road|eventually)\b/gi,
-    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*on (hold|ice|the back burner))\b/gi,
+    /\b(not (the right|a good) time|premature|too early|revisit later|park (this|that|it)|put.*?on (hold|ice|the back burner))\b/gi,
     /\b(defer|postpone|delay|punt|kick the can)\b/gi,
     /\btable (this|that|the discussion|the decision)\b/gi,
     /\bcircle back\b/gi
@@ -38,7 +40,7 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
   }
 
   const detected = matches.length > 0
-  const confidence = Math.min(matches.length * 0.3, 1.0)
+  const confidence = Math.min(matches.length * CONFIDENCE_WEIGHT_PER_MATCH, 1.0)
 
   return { detected, matches, confidence }
 }
@@ -46,12 +48,9 @@ function detectCanKicking(text: string): { detected: boolean; matches: string[];
 app.post('/api/v1/dialectic', async (c) => {
   const { input } = await c.req.json()
 
-  // Validate input
-  if (!input || typeof input !== 'string') {
-    return c.json({
-      status: 'error',
-      message: 'Invalid input: expected a non-empty string'
-    }, 400)
+  // Validate input field
+  if (input === undefined || input === null || typeof input !== 'string') {
+    return c.json({ error: 'Invalid input: must be a string' }, 400)
   }
 
   // Pattern #47 "Can Kicking" detection
