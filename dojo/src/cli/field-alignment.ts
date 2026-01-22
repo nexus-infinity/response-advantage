@@ -63,7 +63,22 @@ class FieldAlignmentChecker {
   
   constructor(localFieldPath?: string, repoPath?: string) {
     this.localFieldPath = localFieldPath || this.detectLocalFieldPath()
-    this.repoPath = repoPath || process.cwd()
+    this.repoPath = repoPath || this.findRepoRoot()
+  }
+
+  private findRepoRoot(): string {
+    let currentDir = process.cwd()
+    
+    // Walk up until we find .git directory or reach root
+    while (currentDir !== '/') {
+      if (fs.existsSync(path.join(currentDir, '.git'))) {
+        return currentDir
+      }
+      currentDir = path.dirname(currentDir)
+    }
+    
+    // Fallback to current directory
+    return process.cwd()
   }
 
   private detectLocalFieldPath(): string {
@@ -221,6 +236,20 @@ class FieldAlignmentChecker {
     if (!fs.existsSync(specPath)) {
       issues.push('Missing GEOMETRIC_SPEC.md in repository')
       recommendations.push('Create GEOMETRIC_SPEC.md to document canonical S0→S7 process')
+    } else {
+      recommendations.push('✅ GEOMETRIC_SPEC.md found - canonical specification exists')
+    }
+
+    // Check for shared geometric-core
+    const geometricCorePath = path.join(this.repoPath, 'shared/geometric-core')
+    if (fs.existsSync(geometricCorePath)) {
+      recommendations.push('✅ Shared geometric-core found - use for implementation')
+      const s4Path = path.join(geometricCorePath, 'typescript/src/s4-kings-chamber.ts')
+      if (fs.existsSync(s4Path)) {
+        recommendations.push('✅ S4 King\'s Chamber (spin reversal) implemented in geometric-core')
+      }
+    } else {
+      recommendations.push('Create shared/geometric-core for S0→S7 implementation')
     }
 
     // Alignment score recommendations

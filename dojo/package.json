@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "tsx watch src/api/server.ts",
     "build": "tsc",
-    "start": "node dist/api/server.js"
+    "start": "node dist/api/server.js",
+    "check:alignment": "tsx src/cli/field-alignment.ts check",
+    "sync:field": "tsx src/cli/field-alignment.ts sync"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.9",
