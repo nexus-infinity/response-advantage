@@ -323,101 +323,128 @@ export default function LandingPage() {
               </div>
             )}
 
-            {/* TRANSFORMATION STAGES - Quick/Deep dual output */}
+            {/* TRANSFORMATION STAGES - INPUT -> SYMBOL -> OUTPUT */}
             {stage !== "chaos" && (
               <div className="animate-in fade-in duration-700">
-                {/* Stage header */}
-                <div className="text-center mb-8">
-                  <div
-                    className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
-                    style={{
-                      backgroundColor: `${currentColor}20`,
-                      boxShadow: `0 0 60px ${currentColor}30`,
-                    }}
-                  >
-                    <span className="text-4xl" style={{ color: currentColor }}>
-                      {TRANSFORMATIONS[stage].symbol}
-                    </span>
-                  </div>
-                  <h2 className="text-xl md:text-2xl font-light tracking-wider" style={{ color: currentColor }}>
-                    {TRANSFORMATIONS[stage].label}
-                  </h2>
-                  <p className="text-white/40 text-sm mt-1">{TRANSFORMATIONS[stage].verb} the chaos</p>
-                </div>
-
-                {/* QUICK / DEEP dual output cards */}
-                <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                  {/* QUICK Output */}
-                  <div
-                    className="border rounded-2xl p-6 animate-in slide-in-from-left duration-500"
-                    style={{
-                      backgroundColor: `${currentColor}08`,
-                      borderColor: `${currentColor}40`,
-                    }}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-2xl" style={{ color: currentColor }}>
-                        {TRANSFORMATIONS[stage].symbol}
-                      </span>
-                      <div>
-                        <span
-                          className="text-[11px] font-bold tracking-widest"
-                          style={{ color: currentColor }}
-                        >
-                          {TRANSFORMATIONS[stage].quick.label}
-                        </span>
-                        <p className="text-[10px] text-white/40">{TRANSFORMATIONS[stage].quick.hint}</p>
-                      </div>
-                    </div>
-
-                    <div className="bg-black/40 border border-white/10 rounded-xl p-4">
-                      <pre className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap font-sans">
-                        {TRANSFORMATIONS[stage].quick.output}
-                      </pre>
-                    </div>
-
-                    {/* Copy hint */}
-                    <p className="text-[10px] text-white/30 mt-3 text-right">Click to copy</p>
-                  </div>
-
-                  {/* DEEP Output */}
-                  <div
-                    className="border rounded-2xl p-6 animate-in slide-in-from-right duration-500"
-                    style={{
-                      backgroundColor: "rgba(255,255,255,0.02)",
-                      borderColor: `${currentColor}25`,
-                    }}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <span className="text-2xl opacity-50" style={{ color: currentColor }}>
-                        {TRANSFORMATIONS[stage].symbol}
-                      </span>
-                      <div>
-                        <span className="text-[11px] font-bold tracking-widest text-white/60">
-                          {TRANSFORMATIONS[stage].deep.label}
-                        </span>
-                        <p className="text-[10px] text-white/40">{TRANSFORMATIONS[stage].deep.hint}</p>
-                      </div>
-                    </div>
-
-                    <div className="space-y-3">
-                      {TRANSFORMATIONS[stage].deep.items.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 animate-in slide-in-from-bottom duration-300"
-                          style={{ animationDelay: `${idx * 100}ms` }}
-                        >
-                          <span
-                            className="w-2 h-2 rounded-full mt-1.5 shrink-0"
-                            style={{ backgroundColor: currentColor }}
-                          />
-                          <span className="text-white/70 text-sm">{item}</span>
+                {/* Three-column transformation: INPUT | SYMBOL | OUTPUT */}
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto,1.5fr] gap-6 items-start max-w-6xl mx-auto">
+                  
+                  {/* INPUT - What flows INTO the symbol */}
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-5 animate-in slide-in-from-left duration-500 lg:self-center">
+                    <p className="text-[10px] tracking-widest text-white/40 mb-3">INPUT</p>
+                    <div className="space-y-2">
+                      {stage === "observe" && (
+                        <p className="text-white/60 text-sm">Confusing email fragments, scattered claims, institutional jargon...</p>
+                      )}
+                      {stage === "ground" && (
+                        <p className="text-white/60 text-sm italic">"What are my rights? What laws apply? Who has power here?"</p>
+                      )}
+                      {stage === "recognise" && (
+                        <div className="space-y-2">
+                          <p className="text-white/50 text-xs">"Investigation revealed..."</p>
+                          <p className="text-white/50 text-xs">"Privacy for the caller..."</p>
+                          <p className="text-white/50 text-xs">"Unable to prove..."</p>
                         </div>
-                      ))}
+                      )}
+                      {stage === "act" && (
+                        <p className="text-white/60 text-sm line-through opacity-50">Feeling stuck. No clear path. Exhausted by complexity.</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SYMBOL - The processing anchor */}
+                  <div className="flex flex-col items-center justify-center py-4 lg:py-0">
+                    <div
+                      className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center animate-pulse"
+                      style={{
+                        backgroundColor: `${currentColor}20`,
+                        boxShadow: `0 0 60px ${currentColor}40`,
+                      }}
+                    >
+                      <span className="text-5xl md:text-6xl" style={{ color: currentColor }}>
+                        {TRANSFORMATIONS[stage].symbol}
+                      </span>
+                    </div>
+                    <p className="text-xs mt-3 font-medium tracking-wider" style={{ color: currentColor }}>
+                      {TRANSFORMATIONS[stage].label}
+                    </p>
+                    <p className="text-[10px] text-white/40 mt-1">{TRANSFORMATIONS[stage].verb}</p>
+                  </div>
+
+                  {/* OUTPUT - QUICK / DEEP dual output */}
+                  <div className="space-y-4 animate-in slide-in-from-right duration-500">
+                    {/* QUICK Output */}
+                    <div
+                      className="border rounded-2xl p-6 animate-in slide-in-from-left duration-500"
+                      style={{
+                        backgroundColor: `${currentColor}08`,
+                        borderColor: `${currentColor}40`,
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl" style={{ color: currentColor }}>
+                          {TRANSFORMATIONS[stage].symbol}
+                        </span>
+                        <div>
+                          <span
+                            className="text-[11px] font-bold tracking-widest"
+                            style={{ color: currentColor }}
+                          >
+                            {TRANSFORMATIONS[stage].quick.label}
+                          </span>
+                          <p className="text-[10px] text-white/40">{TRANSFORMATIONS[stage].quick.hint}</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-black/40 border border-white/10 rounded-xl p-4">
+                        <pre className="text-white/90 text-sm leading-relaxed whitespace-pre-wrap font-sans">
+                          {TRANSFORMATIONS[stage].quick.output}
+                        </pre>
+                      </div>
+
+                      {/* Copy hint */}
+                      <p className="text-[10px] text-white/30 mt-3 text-right">Click to copy</p>
                     </div>
 
-                    {/* Expand hint */}
-                    <p className="text-[10px] text-white/30 mt-4 text-right">Click to expand</p>
+                    {/* DEEP Output */}
+                    <div
+                      className="border rounded-2xl p-6 animate-in slide-in-from-right duration-500"
+                      style={{
+                        backgroundColor: "rgba(255,255,255,0.02)",
+                        borderColor: `${currentColor}25`,
+                      }}
+                    >
+                      <div className="flex items-center gap-3 mb-4">
+                        <span className="text-2xl opacity-50" style={{ color: currentColor }}>
+                          {TRANSFORMATIONS[stage].symbol}
+                        </span>
+                        <div>
+                          <span className="text-[11px] font-bold tracking-widest text-white/60">
+                            {TRANSFORMATIONS[stage].deep.label}
+                          </span>
+                          <p className="text-[10px] text-white/40">{TRANSFORMATIONS[stage].deep.hint}</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        {TRANSFORMATIONS[stage].deep.items.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-3 animate-in slide-in-from-bottom duration-300"
+                            style={{ animationDelay: `${idx * 100}ms` }}
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full mt-1.5 shrink-0"
+                              style={{ backgroundColor: currentColor }}
+                            />
+                            <span className="text-white/70 text-sm">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Expand hint */}
+                      <p className="text-[10px] text-white/30 mt-4 text-right">Click to expand</p>
+                    </div>
                   </div>
                 </div>
 
