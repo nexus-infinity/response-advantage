@@ -645,43 +645,101 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-24 px-4 border-t border-white/10">
-        <div className="max-w-xl mx-auto text-center">
-          <div className="flex justify-center gap-3 mb-8">
-            {["●", "▼", "▲", "◼"].map((symbol) => (
-              <span
-                key={symbol}
-                className="text-3xl"
-                style={{
-                  color: SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS],
-                  textShadow: `0 0 20px ${SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS]}40`,
-                }}
-              >
-                {symbol}
-              </span>
-            ))}
+      {/* The Transformation Promise */}
+      <section className="py-24 px-4 border-t border-white/10 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent">
+        <div className="max-w-4xl mx-auto">
+          {/* BEFORE / AFTER contrast */}
+          <div className="grid md:grid-cols-2 gap-8 mb-16">
+            {/* BEFORE */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
+              <p className="text-xs tracking-widest text-white/40 mb-4">BEFORE</p>
+              <p className="text-white/50 text-lg leading-relaxed italic">
+                "I don't know what my rights are. I don't understand what they're saying. I feel stuck, exhausted, powerless."
+              </p>
+              <div className="mt-6 flex items-center gap-2 text-white/30">
+                <span>?</span>
+                <span className="w-8 h-px bg-white/20" />
+                <span>?</span>
+                <span className="w-8 h-px bg-white/20" />
+                <span>?</span>
+              </div>
+            </div>
+
+            {/* AFTER */}
+            <div 
+              className="border rounded-2xl p-8"
+              style={{ 
+                backgroundColor: `${SYMBOL_COLORS["◼"]}10`,
+                borderColor: `${SYMBOL_COLORS["◼"]}40`,
+              }}
+            >
+              <p className="text-xs tracking-widest mb-4" style={{ color: SYMBOL_COLORS["◼"] }}>AFTER</p>
+              <p className="text-white text-lg leading-relaxed font-medium">
+                "I can send this email <span style={{ color: SYMBOL_COLORS["◼"] }}>NOW</span> and build my full case."
+              </p>
+              <div className="mt-6 flex items-center gap-2">
+                {["●", "▼", "▲", "◼"].map((s, i) => (
+                  <span key={s} className="flex items-center">
+                    <span style={{ color: SYMBOL_COLORS[s as keyof typeof SYMBOL_COLORS] }}>{s}</span>
+                    {i < 3 && <span className="w-8 h-px mx-1" style={{ backgroundColor: SYMBOL_COLORS[s as keyof typeof SYMBOL_COLORS] }} />}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-balance">
-            Knowledge should not be the privilege of the few
-          </h2>
-          <p className="text-white/50 mb-8">
-            Transform confusion into clarity. Document, ground, recognise, act.
-          </p>
-          <Link
-            href="/start"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-white/90 transition-colors"
-          >
-            <span className="flex gap-1">
-              {["●", "▼", "▲", "◼"].map((s) => (
-                <span key={s} style={{ color: SYMBOL_COLORS[s as keyof typeof SYMBOL_COLORS] }}>
-                  {s}
+
+          {/* Quick = NOW / Deep = FULL CASE explanation */}
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-6 bg-white/5 border border-white/10 rounded-full px-8 py-4">
+              <div className="text-left">
+                <p className="text-xs font-bold tracking-widest" style={{ color: SYMBOL_COLORS["◼"] }}>QUICK</p>
+                <p className="text-white/60 text-sm">Send NOW</p>
+              </div>
+              <div className="w-px h-8 bg-white/20" />
+              <div className="text-left">
+                <p className="text-xs font-bold tracking-widest text-white/50">DEEP</p>
+                <p className="text-white/60 text-sm">Build full case</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Final CTA */}
+          <div className="text-center">
+            <div className="flex justify-center gap-3 mb-8">
+              {["●", "▼", "▲", "◼"].map((symbol) => (
+                <span
+                  key={symbol}
+                  className="text-3xl"
+                  style={{
+                    color: SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS],
+                    textShadow: `0 0 20px ${SYMBOL_COLORS[symbol as keyof typeof SYMBOL_COLORS]}40`,
+                  }}
+                >
+                  {symbol}
                 </span>
               ))}
-            </span>
-            Start Your Case
-          </Link>
-          <p className="text-white/30 text-xs mt-4">No account required</p>
+            </div>
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-4 text-balance">
+              Knowledge should not be the privilege of the few
+            </h2>
+            <p className="text-white/50 mb-8">
+              Transform confusion into clarity. Document, ground, recognise, act.
+            </p>
+            <Link
+              href="/start"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-medium hover:bg-white/90 transition-colors"
+            >
+              <span className="flex gap-1">
+                {["●", "▼", "▲", "◼"].map((s) => (
+                  <span key={s} style={{ color: SYMBOL_COLORS[s as keyof typeof SYMBOL_COLORS] }}>
+                    {s}
+                  </span>
+                ))}
+              </span>
+              Start Your Case
+            </Link>
+            <p className="text-white/30 text-xs mt-4">No account required</p>
+          </div>
         </div>
       </section>
     </main>
