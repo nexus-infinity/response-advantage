@@ -20,21 +20,21 @@ export default function HealingJourney() {
         symbol="●"
         title="OBSERVE"
         subtitle="Acknowledgement"
-        description="&quot;This happened. I&apos;m not making it up.&quot;"
+        description={`"This happened. I'm not making it up."`}
       />
       
       <HealingStage
         symbol="▼"
         title="GROUND"
         subtitle="Validation"
-        description="&quot;The law says you were wronged.&quot;"
+        description={`"The law says you were wronged."`}
       />
       
       <HealingStage
         symbol="▲"
         title="RECOGNISE"
         subtitle="Pattern Recognition"
-        description="&quot;This wasn&apos;t random. It&apos;s a pattern.&quot;"
+        description={`"This wasn't random. It's a pattern."`}
         note="★ King's Chamber (φ⁻¹ = 38.2%) — Psychological breakthrough point"
         isActive={true}
       />
@@ -43,7 +43,7 @@ export default function HealingJourney() {
         symbol="◼"
         title="ACT"
         subtitle="Empowerment"
-        description="&quot;I can do something about this.&quot;"
+        description={`"I can do something about this."`}
       />
     </div>
   );
