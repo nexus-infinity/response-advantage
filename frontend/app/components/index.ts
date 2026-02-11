@@ -11,3 +11,12 @@ export { default as HealingStage } from './HealingStage';
 export { default as HealingJourney } from './HealingJourney';
 export { default as GeometricNote } from './GeometricNote';
 export { default as ActionButtons } from './ActionButtons';
+
+// Export types
+export type {
+  GeometricStage,
+  AlchemicalStage,
+  HealingSymbol,
+  PsychologicalProcess,
+  HealingStageData,
+} from './types';

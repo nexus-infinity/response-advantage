@@ -5,10 +5,12 @@
  * Maps to the S0-S7 geometric stages defined in GEOMETRIC_SPEC.md
  */
 
+import type { HealingSymbol, PsychologicalProcess } from './types';
+
 interface HealingStageProps {
-  symbol: string;
+  symbol: HealingSymbol;
   title: string;
-  subtitle: string;
+  subtitle: PsychologicalProcess;
   description: string;
   note?: string;
   isActive?: boolean;
