@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@response-advantage/geometric-core": ["shared/geometric-core/typescript/src"],
+      "@response-advantage/types": ["shared/types"]
+    }
+  },
+  "exclude": ["node_modules", "dist", ".next", "out"]
+}
