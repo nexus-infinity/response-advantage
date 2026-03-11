@@ -3,21 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "description": "FIELD Protocol - Geometric accountability through S0-S7 checkpoints",
-  "workspaces": [
-    "frontend",
-    "dojo",
-    "shared/geometric-core/typescript"
-  ],
   "scripts": {
-    "dev": "npm run dev --workspace=frontend",
-    "dev:dojo": "npm run dev --workspace=response-advantage-dojo",
-    "build": "npm run build --workspace=frontend",
-    "build:core": "npm run build --workspace=@response-advantage/geometric-core",
-    "build:all": "npm run build:core && npm run build",
-    "test": "npm run test --workspace=@response-advantage/geometric-core",
-    "check:alignment": "npm run check:alignment --workspace=response-advantage-dojo",
-    "sync:field": "npm run sync:field --workspace=response-advantage-dojo",
-    "lint": "npm run lint --workspace=frontend"
+    "dev": "pnpm --filter frontend dev",
+    "dev:dojo": "pnpm --filter response-advantage-dojo dev",
+    "build": "pnpm --filter frontend build",
+    "build:core": "pnpm --filter @response-advantage/geometric-core build",
+    "build:all": "pnpm build:core && pnpm build",
+    "test": "pnpm --filter @response-advantage/geometric-core test",
+    "check:alignment": "pnpm --filter response-advantage-dojo check:alignment",
+    "sync:field": "pnpm --filter response-advantage-dojo sync:field",
+    "lint": "pnpm --filter frontend lint"
   },
   "repository": {
     "type": "git",
