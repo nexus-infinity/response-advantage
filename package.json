@@ -4,15 +4,15 @@
   "private": true,
   "description": "FIELD Protocol - Geometric accountability through S0-S7 checkpoints",
   "scripts": {
-    "dev": "pnpm --filter frontend dev",
-    "dev:dojo": "pnpm --filter response-advantage-dojo dev",
-    "build": "pnpm --filter frontend build",
-    "build:core": "pnpm --filter @response-advantage/geometric-core build",
+    "dev": "cd frontend && pnpm dev",
+    "dev:dojo": "cd dojo && pnpm dev",
+    "build": "cd frontend && pnpm build",
+    "build:core": "cd shared/geometric-core/typescript && pnpm build",
     "build:all": "pnpm build:core && pnpm build",
-    "test": "pnpm --filter @response-advantage/geometric-core test",
-    "check:alignment": "pnpm --filter response-advantage-dojo check:alignment",
-    "sync:field": "pnpm --filter response-advantage-dojo sync:field",
-    "lint": "pnpm --filter frontend lint"
+    "test": "cd shared/geometric-core/typescript && pnpm test",
+    "check:alignment": "cd dojo && pnpm check:alignment",
+    "sync:field": "cd dojo && pnpm sync:field",
+    "lint": "cd frontend && pnpm lint"
   },
   "repository": {
     "type": "git",
