@@ -1,39 +1,53 @@
 import {
-  Branding,
   HealingJourney,
   GeometricNote,
   ActionButtons,
+  GeometricHero,
 } from './components';
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 font-sans">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col items-center justify-between py-20 px-8 bg-black">
+    <div className="flex min-h-screen flex-col bg-background font-sans">
+      {/* Hero Section with Animated Geometry */}
+      <section className="relative flex flex-col items-center justify-center px-6 pt-16 pb-8">
+        <GeometricHero />
         
-        <Branding />
+        {/* Tagline overlay */}
+        <p className="mt-4 text-sm uppercase tracking-[0.3em] text-muted">
+          Pure function. Nothing else.
+        </p>
+      </section>
 
-        {/* Main Content */}
-        <div className="flex flex-col items-center gap-8 text-center max-w-2xl">
-          <h1 className="text-5xl font-bold leading-tight tracking-tight text-white">
+      {/* Main Content */}
+      <main className="flex flex-1 flex-col items-center px-6 pb-20">
+        <div className="flex w-full max-w-2xl flex-col items-center gap-10 text-center">
+          <h1 className="text-balance text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
             Healing Through Geometric Accountability
           </h1>
           
-          <p className="text-xl leading-relaxed text-zinc-300">
-            When institutions gaslight you, chaos feels like your fault.
-          </p>
-          
-          <p className="text-xl leading-relaxed text-zinc-300">
-            <span className="text-white font-semibold">Upload the evidence.</span>{" "}
-            Watch the geometric transformation reveal the pattern.{" "}
-            <span className="text-white font-semibold">Get your power back.</span>
-          </p>
+          <div className="flex flex-col gap-4">
+            <p className="text-lg leading-relaxed text-muted md:text-xl">
+              When institutions gaslight you, chaos feels like your fault.
+            </p>
+            
+            <p className="text-lg leading-relaxed text-muted md:text-xl">
+              <span className="font-semibold text-foreground">Upload the evidence.</span>{" "}
+              Watch the geometric transformation reveal the pattern.{" "}
+              <span className="font-semibold text-foreground">Get your power back.</span>
+            </p>
+          </div>
 
           <HealingJourney />
           <GeometricNote />
         </div>
-
-        <ActionButtons />
       </main>
+
+      {/* Fixed Action Bar */}
+      <footer className="sticky bottom-0 border-t border-border bg-background/80 backdrop-blur-sm">
+        <div className="mx-auto max-w-2xl px-6 py-4">
+          <ActionButtons />
+        </div>
+      </footer>
     </div>
   );
 }

@@ -15,7 +15,7 @@ import HealingStage from './HealingStage';
 
 export default function HealingJourney() {
   return (
-    <div className="mt-12 w-full text-left space-y-6 text-zinc-400">
+    <div className="mt-8 w-full space-y-4 text-left text-muted">
       <HealingStage
         symbol="●"
         title="OBSERVE"

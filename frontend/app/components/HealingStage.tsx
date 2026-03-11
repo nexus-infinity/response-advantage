@@ -24,21 +24,24 @@ export default function HealingStage({
   note,
   isActive = false
 }: HealingStageProps) {
-  const borderColor = isActive ? 'border-white' : 'border-zinc-700';
-  const titleColor = isActive ? 'text-white' : '';
-  const subtitleColor = isActive ? 'text-white' : 'text-zinc-300';
-  const descriptionColor = isActive ? 'text-zinc-400' : 'text-zinc-500';
-
   return (
-    <div className={`border-l-2 ${borderColor} pl-6 py-2`}>
-      <div className={`text-2xl mb-2 ${titleColor}`}>
-        {symbol} {title}
+    <div 
+      className={`border-l-2 py-3 pl-5 transition-colors ${
+        isActive ? 'border-accent' : 'border-border'
+      }`}
+    >
+      <div className={`mb-1 flex items-center gap-2 text-lg font-medium ${
+        isActive ? 'text-accent' : 'text-foreground'
+      }`}>
+        <span className="text-xl">{symbol}</span>
+        <span className="uppercase tracking-wider">{title}</span>
       </div>
-      <p className={`text-sm ${descriptionColor}`}>
-        <span className={subtitleColor}>{subtitle}:</span> {description}
+      <p className="text-sm text-muted-foreground">
+        <span className={isActive ? 'text-foreground' : 'text-muted'}>{subtitle}:</span>{' '}
+        {description}
       </p>
       {note && (
-        <p className="text-xs text-zinc-500 mt-1">
+        <p className="mt-1 text-xs text-accent/70">
           {note}
         </p>
       )}

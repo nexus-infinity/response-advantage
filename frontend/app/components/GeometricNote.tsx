@@ -10,13 +10,13 @@
 
 export default function GeometricNote() {
   return (
-    <div className="mt-12 p-6 border border-zinc-800 rounded-lg text-sm text-zinc-500">
-      <p className="mb-2 text-zinc-400">
-        <strong>This is trauma resolution through geometric proof.</strong>
+    <div className="mt-8 rounded-lg border border-border bg-background/50 p-5 text-sm">
+      <p className="mb-2 font-medium text-foreground">
+        This is trauma resolution through geometric proof.
       </p>
-      <p>
+      <p className="text-muted-foreground">
         Four alchemical stages. Four psychological transformations. 
-        Eight geometric checkpoints (S0→S7). Pattern #47 detection at 94% confidence.
+        Eight geometric checkpoints (S0&#8594;S7). Pattern #47 detection at 94% confidence.
       </p>
     </div>
   );

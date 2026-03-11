@@ -11,6 +11,7 @@ export { default as HealingStage } from './HealingStage';
 export { default as HealingJourney } from './HealingJourney';
 export { default as GeometricNote } from './GeometricNote';
 export { default as ActionButtons } from './ActionButtons';
+export { GeometricHero } from './geometric-hero';
 
 // Export types
 export type {
