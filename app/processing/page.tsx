@@ -410,19 +410,23 @@ export default function ProcessingPage() {
   const allDone = actions.length > 0 && actions.every((a) => a.status === "done")
 
   // Timeout fallback - if loading takes too long, skip to demo mode
-  const [loadTimeout, setLoadTimeout] = useState(false)
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!eventsLoaded || !mapLoaded) {
         console.log("[v0] Loading timeout - switching to fallback mode")
-        setLoadTimeout(true)
         // Force events loaded with fallback coords
         if (!eventsLoaded) {
-          setEvents(caseEvents.map(e => ({
-            ...e,
+          const fallbackEvents: LocationEvent[] = caseEvents.map(e => ({
+            id: e.id,
+            symbol: e.symbol,
+            title: e.title,
+            time: e.time,
+            address: e.address,
+            detail: e.detail,
             coords: { lat: -37.8136, lng: 144.9631 },
             pinColor: SYMBOL_COLORS[e.symbol] || SYMBOL_COLORS["●"],
-          })))
+          }))
+          setEvents(fallbackEvents)
           setEventsLoaded(true)
         }
         setMapLoaded(true)
