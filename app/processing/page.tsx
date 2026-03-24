@@ -408,6 +408,28 @@ export default function ProcessingPage() {
 
   const allDone = actions.length > 0 && actions.every((a) => a.status === "done")
 
+  // Timeout fallback - if loading takes too long, skip to demo mode
+  const [loadTimeout, setLoadTimeout] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!eventsLoaded || !mapLoaded) {
+        console.log("[v0] Loading timeout - switching to fallback mode")
+        setLoadTimeout(true)
+        // Force events loaded with fallback coords
+        if (!eventsLoaded) {
+          setEvents(caseEvents.map(e => ({
+            ...e,
+            coords: { lat: -37.8136, lng: 144.9631 },
+            pinColor: SYMBOL_COLORS[e.symbol] || SYMBOL_COLORS["●"],
+          })))
+          setEventsLoaded(true)
+        }
+        setMapLoaded(true)
+      }
+    }, 8000) // 8 second timeout
+    return () => clearTimeout(timer)
+  }, [eventsLoaded, mapLoaded])
+
   // Loading state while geocoding
   if (!eventsLoaded || !mapLoaded) {
     return (
@@ -429,6 +451,9 @@ export default function ProcessingPage() {
           </div>
           <p className="text-white/50 text-sm tracking-widest">
             {!eventsLoaded ? "GEOCODING ADDRESSES..." : "LOADING MAP..."}
+          </p>
+          <p className="text-white/30 text-xs mt-4">
+            If this takes too long, the demo will start automatically
           </p>
         </div>
       </main>
