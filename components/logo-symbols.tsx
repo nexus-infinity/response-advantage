@@ -1,53 +1,57 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { SYMBOL_COLORS, SYMBOL_META, type SymbolKey } from "@/lib/constants/symbols"
 
 interface LogoSymbolsProps {
   animate?: boolean
   size?: "sm" | "md" | "lg"
   className?: string
+  direction?: "row" | "column"
 }
 
-export function LogoSymbols({ animate = false, size = "md", className = "" }: LogoSymbolsProps) {
+const SYMBOLS: SymbolKey[] = ["●", "▼", "▲", "◼"]
+
+export function LogoSymbols({ 
+  animate = false, 
+  size = "md", 
+  className = "",
+  direction = "column" 
+}: LogoSymbolsProps) {
   const [activeIndex, setActiveIndex] = useState(0)
 
-  // Muted, chakra-aligned colors for reputable evidence aesthetic
-  const symbols = [
-    { char: "●", label: "Evidence", color: "#7B6B8D" }, // muted violet
-    { char: "▼", label: "Law", color: "#A85D3B" },      // terracotta
-    { char: "▲", label: "Pattern", color: "#9A7B2C" },  // antique gold
-    { char: "◼", label: "Action", color: "#4A6FA5" },   // steel blue
-  ]
-
+  // Uniform sizing for all symbols
   const sizeClasses = {
-    sm: "text-xl gap-1",
-    md: "text-3xl gap-2",
-    lg: "text-5xl gap-3",
+    sm: { container: direction === "row" ? "gap-2" : "gap-1", symbol: "text-sm" },      // 14px uniform
+    md: { container: direction === "row" ? "gap-3" : "gap-2", symbol: "text-base" },    // 16px uniform
+    lg: { container: direction === "row" ? "gap-4" : "gap-3", symbol: "text-xl" },      // 20px uniform
   }
 
   useEffect(() => {
     if (!animate) return
 
     const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % symbols.length)
+      setActiveIndex((prev) => (prev + 1) % SYMBOLS.length)
     }, 600)
 
     return () => clearInterval(interval)
-  }, [animate, symbols.length])
+  }, [animate])
+
+  const { container, symbol: symbolSize } = sizeClasses[size]
 
   return (
-    <div className={`flex flex-col items-center ${sizeClasses[size]} ${className}`}>
-      {symbols.map((symbol, index) => (
+    <div className={`flex ${direction === "row" ? "flex-row" : "flex-col"} items-center ${container} ${className}`}>
+      {SYMBOLS.map((symbol, index) => (
         <span
-          key={index}
-          className="transition-all duration-300"
+          key={symbol}
+          className={`${symbolSize} transition-all duration-300`}
           style={{
-            color: animate && index === activeIndex ? symbol.color : "var(--muted-foreground)",
-            opacity: animate ? (index === activeIndex ? 1 : 0.2) : 0.6,
+            color: animate && index === activeIndex ? SYMBOL_COLORS[symbol] : SYMBOL_COLORS[symbol],
+            opacity: animate ? (index === activeIndex ? 1 : 0.3) : 0.6,
             transform: animate && index === activeIndex ? "scale(1.1)" : "scale(1)",
           }}
         >
-          {symbol.char}
+          {symbol}
         </span>
       ))}
     </div>

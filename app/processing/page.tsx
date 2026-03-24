@@ -5,12 +5,13 @@ import { NARRATIVE_STAGES, type Stage, type ContrastComparison } from "@/lib/typ
 
 type Phase = "intro" | "map" | "flying" | "contrast" | "questions" | "actions" | "complete"
 
-// Symbol colors from manifest
+// Symbol colors - muted, professional, chakra-aligned
+// Reputable evidence aesthetic: subdued but meaningful
 const SYMBOL_COLORS: Record<string, string> = {
-  "●": "#9370DB", // OBI-WAN - Observer
-  "▼": "#FF8C00", // TATA - Evidence  
-  "▲": "#FFD700", // ATLAS - Intelligence
-  "◼": "#0066CC", // DOJO - Manifestation
+  "●": "#7B6B8D", // OBI-WAN - muted violet (Crown/Third Eye - observation)
+  "▼": "#A85D3B", // TATA - terracotta (Sacral - grounding, law)
+  "▲": "#9A7B2C", // ATLAS - antique gold (Solar Plexus - pattern recognition)
+  "◼": "#4A6FA5", // DOJO - steel blue (Throat - manifestation, speech)
 }
 
 // Map location event with real address
