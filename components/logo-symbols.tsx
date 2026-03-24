@@ -11,11 +11,12 @@ interface LogoSymbolsProps {
 export function LogoSymbols({ animate = false, size = "md", className = "" }: LogoSymbolsProps) {
   const [activeIndex, setActiveIndex] = useState(0)
 
+  // Muted, chakra-aligned colors for reputable evidence aesthetic
   const symbols = [
-    { char: "●", label: "Evidence", color: "var(--evidence)" },
-    { char: "▼", label: "Law", color: "var(--law)" },
-    { char: "▲", label: "Pattern", color: "var(--pattern)" },
-    { char: "◼", label: "Action", color: "var(--action)" },
+    { char: "●", label: "Evidence", color: "#7B6B8D" }, // muted violet
+    { char: "▼", label: "Law", color: "#A85D3B" },      // terracotta
+    { char: "▲", label: "Pattern", color: "#9A7B2C" },  // antique gold
+    { char: "◼", label: "Action", color: "#4A6FA5" },   // steel blue
   ]
 
   const sizeClasses = {

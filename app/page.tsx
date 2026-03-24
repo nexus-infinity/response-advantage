@@ -4,14 +4,18 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 
-// Symbol colors - the transformation palette
+// Symbol colors - muted, professional, chakra-aligned
+// Reputable evidence aesthetic: subdued but meaningful
 const SYMBOL_COLORS = {
-  chaos: "#666666",
-  "●": "#9370DB", // Document - purple (observation)
-  "▼": "#FF8C00", // Ground - orange (evidence/law)
-  "▲": "#FFD700", // Recognise - gold (pattern detection)
-  "◼": "#0066CC", // Act - blue (manifestation)
+  chaos: "#4a4a4a",
+  "●": "#7B6B8D", // Document - muted violet (Crown/Third Eye - observation)
+  "▼": "#A85D3B", // Ground - terracotta (Sacral - grounding, law)
+  "▲": "#9A7B2C", // Recognise - antique gold (Solar Plexus - pattern recognition)
+  "◼": "#4A6FA5", // Act - steel blue (Throat - manifestation, speech)
 }
+
+// Symbol size - consistent across all usages
+const SYMBOL_SIZE = "text-base" // 16px - professional, readable
 
 // The chaotic source material - real email fragments
 const CHAOS_FRAGMENTS = [
@@ -194,6 +198,58 @@ export default function LandingPage() {
             </Link>
           </div>
         </header>
+
+        {/* Functional Side Panel - Symbol Navigation with Deep Links */}
+        <aside className="fixed left-0 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-1 pl-4 pr-2 py-4 bg-black/30 backdrop-blur-sm rounded-r-xl border-r border-y border-white/10">
+          {(["●", "▼", "▲", "◼"] as const).map((symbol) => {
+            const routes = {
+              "●": { href: "/observe", label: "Observe", desc: "Capture evidence" },
+              "▼": { href: "/ground", label: "Ground", desc: "Legal framework" },
+              "▲": { href: "/reduce", label: "Recognise", desc: "Find contradictions" },
+              "◼": { href: "/act", label: "Act", desc: "Generate outputs" },
+            }
+            const route = routes[symbol]
+            const color = SYMBOL_COLORS[symbol]
+            const isActiveStage = stage !== "chaos" && TRANSFORMATIONS[stage].symbol === symbol
+
+            return (
+              <Link
+                key={symbol}
+                href={route.href}
+                className="group flex items-center gap-3 px-3 py-2 rounded-lg transition-all hover:bg-white/5"
+                style={{
+                  backgroundColor: isActiveStage ? `${color}15` : "transparent",
+                }}
+              >
+                <span 
+                  className={`${SYMBOL_SIZE} transition-all`}
+                  style={{ 
+                    color,
+                    opacity: isActiveStage ? 1 : 0.5,
+                  }}
+                >
+                  {symbol}
+                </span>
+                <div className="flex flex-col opacity-0 group-hover:opacity-100 transition-opacity w-0 group-hover:w-24 overflow-hidden">
+                  <span className="text-[10px] font-medium text-white/80 whitespace-nowrap">{route.label}</span>
+                  <span className="text-[9px] text-white/40 whitespace-nowrap">{route.desc}</span>
+                </div>
+              </Link>
+            )
+          })}
+          
+          {/* Divider */}
+          <div className="w-full h-px bg-white/10 my-2" />
+          
+          {/* Quick actions */}
+          <Link
+            href="/start"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-all hover:bg-white/5 group"
+          >
+            <span className={`${SYMBOL_SIZE} text-white/30 group-hover:text-white/60 transition-colors`}>+</span>
+            <span className="text-[10px] text-white/40 group-hover:text-white/60 opacity-0 group-hover:opacity-100 transition-all w-0 group-hover:w-20 overflow-hidden whitespace-nowrap">New Case</span>
+          </Link>
+        </aside>
 
         {/* Symbol Navigation */}
         <nav className="relative z-20 flex items-center justify-center gap-2 md:gap-4 px-4 py-6">
