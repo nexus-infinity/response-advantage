@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // Enable output tracing for monorepo builds (Vercel)
@@ -9,8 +10,11 @@ const nextConfig: NextConfig = {
   
   // Experimental features for Next.js 16
   experimental: {
-    // Enable Turbopack (stable in Next.js 16)
-    turbo: {},
+    // Turbopack configuration for monorepo
+    turbo: {
+      // Explicitly set root to the monorepo root so Turbopack can resolve packages
+      root: path.resolve(__dirname, ".."),
+    },
   },
 };
 
