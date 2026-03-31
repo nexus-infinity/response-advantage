@@ -6,6 +6,14 @@
 
 ---
 
+## About Responsive Advantage
+
+**Canonical Description (Funder-Facing):**
+
+Responsive Advantage is a tranche-based funding model that directly maps dollars to forensic deliverables. Every funding request enforces Conservation (evidence-cost transparency), Symmetry (uniform rules for funder and applicant), and procedural Resonance. Funding advances by structure, not negotiation. This is how we keep truth-production aligned across administrative churn.
+
+---
+
 ## Purpose
 
 Responsive Advantage is the **funding intake and approval interface** for Nexxus Infinity. It enforces Conservation and Symmetry constraints on all incoming funding packets before advancing to processing.
@@ -402,4 +410,25 @@ Before approving any funding packet, verify:
 - [ ] Applicant metadata complete
 - [ ] Reason codes documented (if revision requested)
 - [ ] Processing ID will be assigned upon approval
+
+---
+
+## Bridge: Inventory & Logistics Prospectus to Nexxus Infinity
+
+Responsive Advantage can be presented to external funders as a standard "business model" + "operational infrastructure" narrative. The following mapping translates standard funding/prospectus language into Layer A/B/C/D terms:
+
+| Prospectus Section | Nexxus Layer | What It Means |
+|--------------------|--------------|--------------|
+| Company Overview | Layer A (Recognition) | Identity, persistent Refs, lineage, versioning—who we are and what persists across time |
+| Business Model | Layer B (Constraints) | Four Laws + Four Doctrines—how we ensure truth-production survives hostile environments |
+| Financial Information | Layer B (Conservation ledger) | Every spend anchored to artifact; untraced money blocked; financials auditable |
+| Market Analysis | Layer D (Interface map) | Who resists symmetry; which channels accept our structure; terrain mapping |
+| Operational Infrastructure | Layer C (FIELD) | ProofStore, PULSE, Brick Registry—the processing machinery that converts reality to verifiable units |
+| Risk Factors | Layer B/C (Failure modes) | Unresolved geometry, administrative churn, evidence suppression, procedural timing violations |
+| Growth Strategy | Layer D (Tranche cadence) | How we scale via discrete, bounded deployments—each tranche a complete, verified unit |
+| Corporate Governance | Layer B (Symmetric enforcement) | Reason codes, explicit status tracking, no asymmetric discretion—same rules for all parties |
+| Legal/Regulatory Compliance | Layer B (Resonance) | Procedural timing, valid channels, correct format—we advance by alignment with legal structure, not against it |
+| Use of Proceeds | Layer D (Interface outputs) | What each funding tranche produces—publication, filing, funding, evidence bundles—each trackable to this Ref |
+
+**Key Point:** You don't need special language for external audiences. Responsive Advantage *is* a legitimate business model; Nexxus Infinity is the discipline that makes it work. The prospectus is the external skin; the architecture is the internal discipline.
 

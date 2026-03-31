@@ -45,7 +45,44 @@ Example: FIELD-FOI-20260331-042
 
 *Purpose: Determine what information can advance through the system.*
 
-All processing decisions derive from four immutable constraints:
+All processing decisions derive from four immutable constraints, guided by two operational doctrines:
+
+---
+
+#### **Operational Doctrine I: Posture (Taoism)**
+
+*How we move without forcing; how we shape conditions so the next correct step is inevitable.*
+
+- **Wu Wei (Non-Forcing):** We do not fight reality. We do not push arguments harder when they meet resistance. Instead, we reduce scope, increase anchors, and re-present in a form the interface can accept without discretion.
+- **Simplicity:** Prefer small, clean tranches over comprehensive narratives. Atomic deliverables beat grand claims.
+- **Yielding Strength:** When an interface resists, retreat strategically. Hold the boundary; don't cross it until you have anchors that make crossing inevitable.
+
+**Practical Motion:**
+- Reduce force, increase alignment.
+- Act only when structure makes the action the path of least resistance.
+- Never spend scarce resources (time, money, evidence) on actions that don't produce durable artifacts.
+
+---
+
+#### **Operational Doctrine II: Strategy (Sun Tzu)**
+
+*How we win without battle; how we make victory inevitable through terrain awareness and supply protection.*
+
+- **Win Without Battle:** The objective is not persuasion; it is inevitability through structure. The best outcome is when the other side must agree because the packet is mechanically correct.
+- **Terrain First:** Always identify the interface, its rules, its incentives, and its failure modes before acting. Know which channel (funding, filing, publication) before making the move.
+- **Lines of Supply:** Protect time, attention, money, and evidence integrity. Never break the audit trail; never let an artifact lose chain-of-custody.
+- **Deception Restraint (Critical):** Use ambiguity only to protect privacy and sensitivity; never to distort claims. If something is unknown, label it Unknown. If something is uncertain, quantify the uncertainty.
+
+**Practical Victory:**
+- Choose terrain (interface type) before making the move.
+- Make the packet mechanically correct so resistance becomes irrational.
+- Protect the supply line (evidence chain) above all else.
+
+---
+
+#### **The Four Kernel Laws (Admissibility Rules)**
+
+These laws determine what information can advance. All are equally weighted; violation of any one blocks processing.
 
 #### **1. Conservation**
 *No claim advances without evidence cost paid.*
@@ -86,6 +123,24 @@ All processing decisions derive from four immutable constraints:
 - Evidence bundle integrity verified by persistent hash
 
 **Enforcement:** Identity layer prevents erasure; hash verification prevents tampering
+
+---
+
+#### **Integration: Doctrines + Laws**
+
+```
+Wu Wei + Yin/Yang Balance
+        ↓
+    Conservation (no proof, no advance)
+    + Symmetry (equal structure)
+    + Resonance (right timing)
+    + Recognition (identity persists)
+        ↓
+Non-Forcing Law: constraints aren't punishment,
+they're natural law. Unanchored claims simply don't advance.
+```
+
+When all four laws are met AND motion follows Taoist/Sun Tzu doctrine, the output becomes inevitable—not through force, but through structural inevitability.
 
 ---
 
