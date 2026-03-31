@@ -26,5 +26,13 @@
     "accountability"
   ],
   "author": "Nexus Infinity",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "next": "16.1.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.15.0"
 }
