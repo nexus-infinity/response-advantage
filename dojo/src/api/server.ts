@@ -12,6 +12,10 @@
 import { serve } from '@hono/node-server'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import {
+  evaluateArtifact,
+  type ArtifactDescriptor,
+} from '../../../shared/geometric-core/typescript/src/artifact-evaluator.js'
 
 const app = new Hono()
 
@@ -99,6 +103,41 @@ app.post('/api/v1/dialectic', async (c) => {
       ? `Detected ${canKickingResult.matches.length} instance(s) of Pattern #47 (Can Kicking)`
       : 'No obfuscation patterns detected'
   })
+})
+
+/**
+ * POST /api/v1/evaluate
+ *
+ * Canonical Agent Evaluation Instruction endpoint.
+ * Runs the six-step pre-merge artifact evaluation (Conservation, Symmetry,
+ * Resonance, Recognition, Constraint, Sizing) and returns a full evaluation
+ * report.  If any check fails, a rollback-safe patch plan is included.
+ *
+ * Body: ArtifactDescriptor (JSON)
+ * Response: ArtifactEvaluationResult (JSON)
+ */
+app.post('/api/v1/evaluate', async (c) => {
+  let body: ArtifactDescriptor
+
+  try {
+    body = await c.req.json<ArtifactDescriptor>()
+  } catch {
+    return c.json({ error: 'Invalid JSON body' }, 400)
+  }
+
+  // Minimal presence validation before handing off to the evaluator
+  if (!body || typeof body !== 'object') {
+    return c.json({ error: 'Request body must be an ArtifactDescriptor object' }, 400)
+  }
+
+  try {
+    const result = await evaluateArtifact(body)
+    const status = result.passed ? 200 : 422
+    return c.json(result, status)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Evaluation failed'
+    return c.json({ error: message }, 500)
+  }
 })
 
 const port = 7411
