@@ -3,22 +3,15 @@
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Minimize2, Menu, X } from "lucide-react"
+import { Home, Menu, X, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-const routes = [
-  {
-    label: "Home",
-    icon: Home,
-    href: "/",
-    color: "text-foreground",
-  },
-  {
-    label: "Quick Reduce",
-    icon: Minimize2,
-    href: "/reduce",
-    color: "text-foreground",
-  },
+// Chakra-aligned symbol system
+const SYMBOL_ROUTES = [
+  { symbol: "●", label: "Observe", href: "/observe", color: "#7B6B8D", desc: "Document evidence" },
+  { symbol: "▼", label: "Ground", href: "/ground", color: "#A85D3B", desc: "Legal framework" },
+  { symbol: "▲", label: "Recognise", href: "/reduce", color: "#9A7B2C", desc: "Find contradictions" },
+  { symbol: "◼", label: "Act", href: "/act", color: "#4A6FA5", desc: "Generate outputs" },
 ]
 
 export function NavigationSidebar() {
@@ -63,48 +56,80 @@ export function NavigationSidebar() {
         <Link
           href="/"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-secondary transition-colors"
+          className="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-white/5 transition-colors group"
+          title="Response Advantage"
         >
-          <div className="flex flex-col items-center gap-0.5 text-base leading-none">
-            <span style={{ color: "var(--evidence)" }}>●</span>
-            <span style={{ color: "var(--law)" }}>▼</span>
-            <span style={{ color: "var(--pattern)" }}>▲</span>
-            <span style={{ color: "var(--action)" }}>■</span>
+          <div className="flex flex-col items-center gap-0.5 text-sm leading-none">
+            <span style={{ color: "#7B6B8D" }}>●</span>
+            <span style={{ color: "#A85D3B" }}>▼</span>
+            <span style={{ color: "#9A7B2C" }}>▲</span>
+            <span style={{ color: "#4A6FA5" }}>◼</span>
           </div>
         </Link>
 
         {/* Divider */}
         <div className="w-8 h-px bg-border" />
 
-        {/* Navigation Items */}
-        <nav className="flex flex-col items-center gap-4 flex-1">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                "flex items-center justify-center w-12 h-12 rounded-lg transition-all hover:bg-secondary group relative",
-                pathname === route.href ? "bg-secondary glow-sand" : "bg-transparent",
-              )}
-              title={route.label}
-            >
-              <route.icon
+        {/* Symbol Navigation - the four stages */}
+        <nav className="flex flex-col items-center gap-2 flex-1">
+          {SYMBOL_ROUTES.map((route) => {
+            const isActive = pathname === route.href
+            return (
+              <Link
+                key={route.href}
+                href={route.href}
+                onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "h-5 w-5 transition-colors",
-                  pathname === route.href ? route.color : "text-muted-foreground group-hover:text-foreground",
+                  "flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all group relative",
+                  isActive ? "bg-white/10" : "hover:bg-white/5",
                 )}
-              />
+                style={{
+                  borderLeft: isActive ? `2px solid ${route.color}` : "2px solid transparent",
+                }}
+                title={route.label}
+              >
+                <span
+                  className="text-lg transition-opacity"
+                  style={{ 
+                    color: route.color,
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                >
+                  {route.symbol}
+                </span>
+                <span className={cn(
+                  "text-[9px] mt-0.5 transition-colors",
+                  isActive ? "text-white/70" : "text-white/40"
+                )}>
+                  {route.label}
+                </span>
 
-              {/* Tooltip on hover - desktop only */}
-              <span className="absolute left-20 px-3 py-1.5 bg-card border border-border rounded-md text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity stone-edge hidden md:block">
-                {route.label}
-              </span>
-            </Link>
-          ))}
+                {/* Tooltip on hover - desktop only */}
+                <div className="absolute left-full ml-3 px-3 py-2 bg-black/90 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity hidden md:block z-50">
+                  <p className="text-xs font-medium text-white whitespace-nowrap">{route.label}</p>
+                  <p className="text-[10px] text-white/50 whitespace-nowrap">{route.desc}</p>
+                </div>
+              </Link>
+            )
+          })}
         </nav>
 
-        <div className="w-2 h-2 rounded-full bg-[var(--stone-bronze)] animate-pulse opacity-60" title="System Active" />
+        {/* Divider */}
+        <div className="w-8 h-px bg-border" />
+
+        {/* New Case button */}
+        <Link
+          href="/start"
+          onClick={() => setMobileOpen(false)}
+          className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+          title="Start new case"
+        >
+          <Plus className="w-5 h-5 text-white/40 group-hover:text-white/60" />
+          <span className="text-[9px] mt-0.5 text-white/40 group-hover:text-white/60">New</span>
+        </Link>
+
+        {/* Status indicator */}
+        <div className="w-2 h-2 rounded-full bg-green-500/60 animate-pulse" title="System Active" />
       </div>
     </>
   )
