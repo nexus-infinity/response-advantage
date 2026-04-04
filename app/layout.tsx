@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { NavigationSidebar } from "@/components/navigation-sidebar"
+import { AISidecar } from "@/components/ai-sidecar"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -50,6 +51,7 @@ export default async function RootLayout({
       <body className={`${inter.className} font-sans antialiased`}>
         <NavigationSidebar />
         <div className="md:ml-20">{children}</div>
+        <AISidecar />
         <Toaster />
         <Analytics />
       </body>
