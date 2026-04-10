@@ -31,14 +31,6 @@ export default function ReducePage() {
 
   return (
     <main className="min-h-screen bg-black flex items-center justify-center px-4 py-12 relative">
-      {/* Geometric context - top left, non-intrusive */}
-      <div
-        className="absolute top-4 left-4 text-xs font-mono select-none"
-        style={{ color: "rgba(255,255,255,0.2)", fontSize: "12px" }}
-        title="Observe → Synthesize → Manifest"
-      >
-        ● → ▲ → ◼
-      </div>
 
       {/* Single glass container */}
       <div

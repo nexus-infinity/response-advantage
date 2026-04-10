@@ -18,10 +18,6 @@ export function NavigationSidebar() {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  if (pathname === "/reduce") {
-    return null
-  }
-
   return (
     <>
       {/* Mobile hamburger button */}
