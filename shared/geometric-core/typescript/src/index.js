@@ -18,6 +18,8 @@ export * from './s4-kings-chamber';
 export * from './s7-crown-manifest';
 // Utilities
 export * from './chronicle-writer';
+// Canonical artifact evaluator (six-step pre-merge evaluation)
+export * from './artifact-evaluator';
 // TODO: Implement remaining stages
 // export * from './s2-vertex-router'
 // export * from './s3-gallery-amplifier'

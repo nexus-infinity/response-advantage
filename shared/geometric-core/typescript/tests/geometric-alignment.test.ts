@@ -11,11 +11,13 @@ import {
   s1_queens_validation,
   s4_kings_chamber,
   s7_crown_manifest,
+  evaluateArtifact,
   FREQUENCIES,
   SYMBOLS,
   PHI_INVERSE,
   SPIN_REVERSAL_POINT,
   COHERENCE_THRESHOLD,
+  type ArtifactDescriptor,
 } from '../src/index'
 
 describe('Geometric Constants', () => {
@@ -257,5 +259,238 @@ describe('Full S0→S7 Pipeline', () => {
     expect(s1_out.caseId).toBe(caseId)
     expect(s4_out.caseId).toBe(caseId)
     expect(s7_out.caseId).toBe(caseId)
+  })
+})
+
+// ============================================================================
+// Canonical Artifact Evaluator — Six-Step Evaluation
+// ============================================================================
+
+const VALID_ARTIFACT: ArtifactDescriptor = {
+  path: '/Users/field/●OBI-WAN/evidence/2026-03-31/merged_doc.pdf',
+  timestamp: '2026-03-31T12:00:00.000Z',
+  actor: 'agent-arkadas',
+  domain: 'FIELD-evidence',
+  scope: ['device-001', 'device-002'],
+  phase: 'validation',
+  prerequisitesComplete: true,
+  lineage: {
+    canonicalRef: 'FIELD-MERGE-20260331-001',
+    version: 'v1.0',
+    status: 'Submitted',
+  },
+}
+
+describe('Artifact Evaluator — Step 1: Anchor Check (Conservation Law)', () => {
+  it('should pass when all anchor fields are present and valid', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.anchor.passed).toBe(true)
+  })
+
+  it('should fail when path is missing', async () => {
+    const artifact = { ...VALID_ARTIFACT, path: '' }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.anchor.passed).toBe(false)
+    expect(result.checks.anchor.details).toContain('path')
+  })
+
+  it('should fail when actor is missing', async () => {
+    const artifact = { ...VALID_ARTIFACT, actor: '' }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.anchor.passed).toBe(false)
+    expect(result.checks.anchor.details).toContain('actor')
+  })
+
+  it('should fail when timestamp is not a valid ISO-8601 date', async () => {
+    const artifact = { ...VALID_ARTIFACT, timestamp: 'not-a-date' }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.anchor.passed).toBe(false)
+    expect(result.checks.anchor.details).toContain('timestamp')
+  })
+})
+
+describe('Artifact Evaluator — Step 2: Scope & Sizing Check (Symmetry Law)', () => {
+  it('should pass when scope is bounded and domain is set', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.scope.passed).toBe(true)
+  })
+
+  it('should fail when scope is empty', async () => {
+    const artifact = { ...VALID_ARTIFACT, scope: [] }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.scope.passed).toBe(false)
+  })
+
+  it('should fail when domain is missing', async () => {
+    const artifact = { ...VALID_ARTIFACT, domain: '' }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.scope.passed).toBe(false)
+    expect(result.checks.scope.details).toContain('Domain')
+  })
+
+  it('should fail when artifact content has phantom entries not in the registry', async () => {
+    const artifact: ArtifactDescriptor = {
+      ...VALID_ARTIFACT,
+      content: { 'device-001': { status: 'ok' }, 'phantom-device': { status: 'ghost' } },
+      fieldRegistry: { 'device-001': { status: 'ok' } },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.scope.passed).toBe(false)
+    expect(result.checks.scope.data?.phantomEntries).toContain('phantom-device')
+  })
+})
+
+describe('Artifact Evaluator — Step 3: Procedural Timing Check (Resonance Law)', () => {
+  it('should pass when phase is set and prerequisites are complete', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.timing.passed).toBe(true)
+  })
+
+  it('should fail when prerequisites are not complete', async () => {
+    const artifact = { ...VALID_ARTIFACT, prerequisitesComplete: false }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.timing.passed).toBe(false)
+    expect(result.checks.timing.details).toContain('prerequisites')
+  })
+
+  it('should fail when phase is missing', async () => {
+    const artifact = { ...VALID_ARTIFACT, phase: '' }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.timing.passed).toBe(false)
+  })
+})
+
+describe('Artifact Evaluator — Step 4: Identity & Lineage Check (Recognition Law)', () => {
+  it('should pass when all lineage fields are present', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.lineage.passed).toBe(true)
+    expect(result.checks.lineage.data?.canonicalRef).toBe('FIELD-MERGE-20260331-001')
+  })
+
+  it('should fail when version is missing', async () => {
+    const artifact = {
+      ...VALID_ARTIFACT,
+      lineage: { ...VALID_ARTIFACT.lineage, version: '' },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.lineage.passed).toBe(false)
+    expect(result.checks.lineage.details).toContain('version')
+  })
+
+  it('should include supersedes and relatedRefs when provided', async () => {
+    const artifact: ArtifactDescriptor = {
+      ...VALID_ARTIFACT,
+      lineage: {
+        ...VALID_ARTIFACT.lineage,
+        supersedes: 'FIELD-MERGE-20260330-001',
+        relatedRefs: ['FIELD-PLAN-20260329-001'],
+      },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.lineage.passed).toBe(true)
+    expect(result.checks.lineage.data?.supersedes).toBe('FIELD-MERGE-20260330-001')
+  })
+})
+
+describe('Artifact Evaluator — Step 5: Constraint Validation', () => {
+  it('should pass for a fully valid artifact', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.constraints.passed).toBe(true)
+    expect(result.checks.constraints.data?.constraintsChecked).toBe(4)
+  })
+
+  it('should fail when canonicalRef is too short', async () => {
+    const artifact = {
+      ...VALID_ARTIFACT,
+      lineage: { ...VALID_ARTIFACT.lineage, canonicalRef: 'AB' },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.constraints.passed).toBe(false)
+  })
+
+  it('should fail when version does not follow vN.N pattern', async () => {
+    const artifact = {
+      ...VALID_ARTIFACT,
+      lineage: { ...VALID_ARTIFACT.lineage, version: 'invalid-version' },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.constraints.passed).toBe(false)
+    expect(result.checks.constraints.data?.violations).toEqual(
+      expect.arrayContaining([expect.stringContaining('version')])
+    )
+  })
+})
+
+describe('Artifact Evaluator — Step 6: Sizing Confirmation (Feedback Loop)', () => {
+  it('should pass basic sizing when no content snapshot is provided', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.checks.sizing.passed).toBe(true)
+  })
+
+  it('should pass when all content entries exist in the registry', async () => {
+    const artifact: ArtifactDescriptor = {
+      ...VALID_ARTIFACT,
+      content: { 'device-001': {}, 'device-002': {} },
+      fieldRegistry: { 'device-001': {}, 'device-002': {} },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.sizing.passed).toBe(true)
+  })
+
+  it('should fail when content is empty', async () => {
+    const artifact: ArtifactDescriptor = {
+      ...VALID_ARTIFACT,
+      content: {},
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.sizing.passed).toBe(false)
+    expect(result.checks.sizing.details).toContain('empty')
+  })
+
+  it('should fail when registry has missing required entries', async () => {
+    const artifact: ArtifactDescriptor = {
+      ...VALID_ARTIFACT,
+      content: { 'device-001': {} }, // device-002 is missing from content
+      fieldRegistry: { 'device-001': {}, 'device-002': {} },
+    }
+    const result = await evaluateArtifact(artifact)
+    expect(result.checks.sizing.passed).toBe(false)
+    expect(result.checks.sizing.data?.missingEntries).toContain('device-002')
+  })
+})
+
+describe('Artifact Evaluator — Full Evaluation', () => {
+  it('should pass all six checks for a fully valid artifact', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+
+    expect(result.passed).toBe(true)
+    expect(result.patchPlan).toBeUndefined()
+    expect(result.canonicalRef).toBe('FIELD-MERGE-20260331-001')
+    expect(result.wisdomSeed).toContain('MERGE CLEARED')
+    expect(result.wisdomSeed).toContain('6/6')
+    expect(result.caseId).toBeDefined()
+    expect(result.timestamp).toBeDefined()
+  })
+
+  it('should return a rollback-safe patch plan when any check fails', async () => {
+    const artifact = {
+      ...VALID_ARTIFACT,
+      path: '',            // fails anchor
+      prerequisitesComplete: false,  // fails timing
+    }
+    const result = await evaluateArtifact(artifact)
+
+    expect(result.passed).toBe(false)
+    expect(result.patchPlan).toBeDefined()
+    expect(result.patchPlan!.length).toBeGreaterThan(1)
+    expect(result.patchPlan![0]).toContain('ROLLBACK-SAFE PATCH PLAN')
+    expect(result.wisdomSeed).toContain('HALT')
+  })
+
+  it('should include caseId, canonicalRef, and timestamp in every result', async () => {
+    const result = await evaluateArtifact(VALID_ARTIFACT)
+    expect(result.caseId).toMatch(/^eval_\d+_/)
+    expect(result.canonicalRef).toBe(VALID_ARTIFACT.lineage.canonicalRef)
+    expect(result.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/)
   })
 })

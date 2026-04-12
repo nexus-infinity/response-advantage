@@ -166,8 +166,15 @@ export const HEALING_MESSAGES = {
     VALIDATION_PROMISE: 'The law will confirm what you already know in your gut.',
     PATTERN_RECOGNITION_PROMISE: "You're not crazy. It's a pattern. You're not alone.",
     EMPOWERMENT_PROMISE: "You'll have the tools. You won't be powerless anymore.",
-    WITNESS_TEMPLATE: (docCount, months) => `I see ${docCount} document${docCount !== 1 ? 's' : ''} spanning ${months} month${months !== 1 ? 's' : ''}`,
+    WITNESS_TEMPLATE: (docCount, months) => {
+        const validDocCount = Math.max(0, Math.floor(docCount));
+        const validMonths = Math.max(0, Math.floor(months));
+        return `I see ${validDocCount} document${validDocCount !== 1 ? 's' : ''} spanning ${validMonths} month${validMonths !== 1 ? 's' : ''}`;
+    },
     VALIDATION_TEMPLATE: (statute, section) => `Under ${statute} ${section}, they were required to...`,
-    PATTERN_DETECTED_TEMPLATE: (patternId, confidence) => `${Math.round(confidence * 100)}% confidence: ${patternId} detected`,
+    PATTERN_DETECTED_TEMPLATE: (patternId, confidence) => {
+        const validConfidence = Math.max(0, Math.min(1, confidence));
+        return `${Math.round(validConfidence * 100)}% confidence: ${patternId} detected`;
+    },
     EMPOWERMENT_TEMPLATE: () => 'You have the tools. You are not powerless.',
 };
