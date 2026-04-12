@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# pnpm lock file is managed at the workspace root
+pnpm-lock.yaml
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
