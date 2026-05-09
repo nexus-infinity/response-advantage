@@ -76,148 +76,144 @@ export function AISidecar() {
 
   return (
     <>
-      {/* Toggle button - fixed position */}
+      {/* Toggle button - Apple-inspired floating action */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed bottom-6 right-6 z-50 flex items-center justify-center",
-          "w-14 h-14 rounded-full transition-all duration-300",
-          "bg-black/80 backdrop-blur-md border border-white/20",
-          "hover:bg-black hover:border-white/30 hover:scale-105",
-          "shadow-lg shadow-black/30",
+          "fixed bottom-8 right-8 z-50 flex items-center justify-center",
+          "w-12 h-12 rounded-2xl transition-smooth",
+          "glass shadow-elevated",
+          "hover:scale-105 active:scale-95",
           isOpen && "opacity-0 pointer-events-none"
         )}
         aria-label="Open AI Assistant"
       >
-        <MessageCircle className="w-6 h-6 text-white/80" />
-        {/* Pulsing indicator when AI is ready */}
-        <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-[#7B6B8D] animate-pulse" />
+        <MessageCircle className="w-5 h-5 text-foreground/70" />
+        {/* Status indicator */}
+        <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500" />
       </button>
 
-      {/* Sidecar panel */}
+      {/* Sidecar panel - Apple-inspired */}
       <aside
         className={cn(
-          "fixed top-0 right-0 z-50 h-full w-full md:w-[400px]",
-          "bg-black/95 backdrop-blur-xl border-l border-white/10",
-          "flex flex-col transition-transform duration-300 ease-out",
+          "fixed top-0 right-0 z-50 h-full w-full md:w-[380px]",
+          "bg-card/95 backdrop-blur-2xl border-l border-border",
+          "flex flex-col transition-smooth",
           isOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        {/* Header */}
-        <header className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+        {/* Header - refined */}
+        <header className="flex items-center justify-between px-5 py-4 border-b border-border">
           <div className="flex items-center gap-3">
             {view === "settings" ? (
               <button
                 type="button"
                 onClick={() => setView("chat")}
-                className="p-1 rounded hover:bg-white/5"
+                className="p-1.5 rounded-lg hover:bg-accent transition-smooth"
               >
-                <ChevronLeft className="w-5 h-5 text-white/60" />
+                <ChevronLeft className="w-4 h-4 text-muted-foreground" />
               </button>
             ) : (
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {(["●", "▼", "▲", "◼"] as const).map((s) => (
                   <span
                     key={s}
-                    className="text-sm"
-                    style={{ color: SYMBOL_COLORS[s], opacity: 0.8 }}
+                    className="text-xs"
+                    style={{ color: SYMBOL_COLORS[s], opacity: 0.7 }}
                   >
                     {s}
                   </span>
                 ))}
               </div>
             )}
-            <span className="text-white/80 text-sm font-medium">
-              {view === "settings" ? "Settings" : "AI Assistant"}
+            <span className="text-foreground/90 text-sm font-medium tracking-tight">
+              {view === "settings" ? "Settings" : "Assistant"}
             </span>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             {view === "chat" && (
               <>
                 <button
                   type="button"
                   onClick={clearChat}
-                  className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="p-2 rounded-lg hover:bg-accent transition-smooth"
                   aria-label="Clear chat"
                   title="Clear chat"
                 >
-                  <Trash2 className="w-4 h-4 text-white/40 hover:text-white/60" />
+                  <Trash2 className="w-4 h-4 text-muted-foreground" />
                 </button>
                 <button
                   type="button"
                   onClick={() => setView("settings")}
-                  className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="p-2 rounded-lg hover:bg-accent transition-smooth"
                   aria-label="Settings"
                 >
-                  <Settings className="w-4 h-4 text-white/40 hover:text-white/60" />
+                  <Settings className="w-4 h-4 text-muted-foreground" />
                 </button>
               </>
             )}
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              className="p-2 rounded-lg hover:bg-accent transition-smooth"
               aria-label="Close AI Assistant"
             >
-              <X className="w-5 h-5 text-white/60" />
+              <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </header>
 
         {/* Content area - switches between chat and settings */}
         {view === "settings" ? (
-          <div className="flex-1 overflow-y-auto p-4">
-            <div className="space-y-6">
+          <div className="flex-1 overflow-y-auto p-5">
+            <div className="space-y-4">
               {/* API Key Status */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+              <div className="p-4 rounded-2xl bg-accent/50">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center">
-                    <Key className="w-5 h-5 text-white/60" />
+                  <div className="w-9 h-9 rounded-xl bg-background flex items-center justify-center shadow-soft">
+                    <Key className="w-4 h-4 text-foreground/60" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-medium text-white">AI Connection</h3>
-                    <p className="text-xs text-white/40">Vercel AI Gateway</p>
+                    <h3 className="text-sm font-medium text-foreground tracking-tight">AI Connection</h3>
+                    <p className="text-xs text-muted-foreground">Vercel AI Gateway</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs text-white/60">Connected via Vercel integration</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="text-xs text-muted-foreground">Connected</span>
                 </div>
-                <p className="text-xs text-white/40 mt-3">
-                  AI is powered by the Vercel AI Gateway. No additional configuration required.
-                </p>
               </div>
 
               {/* Model Info */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <h3 className="text-sm font-medium text-white mb-2">Model</h3>
-                <p className="text-xs text-white/60 mb-3">Claude Sonnet (anthropic/claude-sonnet-4-20250514)</p>
-                <div className="text-xs text-white/40 space-y-1">
-                  <p>Optimized for the geometric framework:</p>
-                  <ul className="list-disc list-inside space-y-1 ml-2">
-                    <li><span style={{ color: SYMBOL_COLORS["●"] }}>●</span> Observation & documentation</li>
-                    <li><span style={{ color: SYMBOL_COLORS["▼"] }}>▼</span> Legal grounding</li>
-                    <li><span style={{ color: SYMBOL_COLORS["▲"] }}>▲</span> Pattern recognition</li>
-                    <li><span style={{ color: SYMBOL_COLORS["◼"] }}>◼</span> Action generation</li>
+              <div className="p-4 rounded-2xl bg-accent/50">
+                <h3 className="text-sm font-medium text-foreground tracking-tight mb-2">Model</h3>
+                <p className="text-xs text-muted-foreground mb-3">Claude Sonnet</p>
+                <div className="text-xs text-muted-foreground space-y-1.5">
+                  <p className="text-foreground/60">Optimized for:</p>
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-2"><span style={{ color: SYMBOL_COLORS["●"] }}>●</span> Observation</li>
+                    <li className="flex items-center gap-2"><span style={{ color: SYMBOL_COLORS["▼"] }}>▼</span> Grounding</li>
+                    <li className="flex items-center gap-2"><span style={{ color: SYMBOL_COLORS["▲"] }}>▲</span> Recognition</li>
+                    <li className="flex items-center gap-2"><span style={{ color: SYMBOL_COLORS["◼"] }}>◼</span> Action</li>
                   </ul>
                 </div>
               </div>
 
               {/* Clear Chat */}
-              <div className="p-4 rounded-xl bg-white/5 border border-white/10">
-                <h3 className="text-sm font-medium text-white mb-2">Chat History</h3>
-                <p className="text-xs text-white/40 mb-3">
-                  {messages.length} message{messages.length !== 1 ? "s" : ""} in current session
+              <div className="p-4 rounded-2xl bg-accent/50">
+                <h3 className="text-sm font-medium text-foreground tracking-tight mb-2">History</h3>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {messages.length} message{messages.length !== 1 ? "s" : ""}
                 </p>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={clearChat}
-                  className="w-full bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white"
+                  className="w-full rounded-xl"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Clear conversation
+                  <Trash2 className="w-3.5 h-3.5 mr-2" />
+                  Clear
                 </Button>
               </div>
             </div>
@@ -225,38 +221,38 @@ export function AISidecar() {
         ) : (
           <>
             {/* Messages area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center px-6">
-                  <div className="flex gap-2 mb-4">
+                <div className="h-full flex flex-col items-center justify-center text-center px-4">
+                  <div className="flex gap-3 mb-5">
                     {(["●", "▼", "▲", "◼"] as const).map((s) => (
                       <span
                         key={s}
-                        className="text-2xl"
-                        style={{ color: SYMBOL_COLORS[s] }}
+                        className="text-xl"
+                        style={{ color: SYMBOL_COLORS[s], opacity: 0.6 }}
                       >
                         {s}
                       </span>
                     ))}
                   </div>
-                  <p className="text-white/60 text-sm mb-2">
-                    I can help you document your case using the geometric framework.
+                  <p className="text-foreground/70 text-sm font-medium tracking-tight mb-1">
+                    How can I help?
                   </p>
-                  <p className="text-white/40 text-xs">
-                    Tell me what happened, and I will help you organize it.
+                  <p className="text-muted-foreground text-xs">
+                    Document your case using the geometric framework.
                   </p>
                   
-                  {/* Quick prompts */}
-                  <div className="mt-6 w-full space-y-2">
+                  {/* Quick prompts - refined */}
+                  <div className="mt-8 w-full space-y-2">
                     <button
                       type="button"
                       onClick={() => {
                         setInput("I received an email that contradicts what they told me before")
                         document.querySelector<HTMLInputElement>("input[type='text']")?.focus()
                       }}
-                      className="w-full p-3 text-left text-xs text-white/50 hover:text-white/70 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
+                      className="w-full p-3.5 text-left text-xs text-muted-foreground hover:text-foreground bg-accent/50 hover:bg-accent rounded-xl transition-smooth"
                     >
-                      &ldquo;I received an email that contradicts what they told me before&rdquo;
+                      &ldquo;I received contradicting information&rdquo;
                     </button>
                     <button
                       type="button"
@@ -264,9 +260,9 @@ export function AISidecar() {
                         setInput("Help me understand my rights in this situation")
                         document.querySelector<HTMLInputElement>("input[type='text']")?.focus()
                       }}
-                      className="w-full p-3 text-left text-xs text-white/50 hover:text-white/70 bg-white/5 hover:bg-white/10 rounded-lg border border-white/10 transition-colors"
+                      className="w-full p-3.5 text-left text-xs text-muted-foreground hover:text-foreground bg-accent/50 hover:bg-accent rounded-xl transition-smooth"
                     >
-                      &ldquo;Help me understand my rights in this situation&rdquo;
+                      &ldquo;Help me understand my rights&rdquo;
                     </button>
                   </div>
                 </div>
@@ -287,8 +283,8 @@ export function AISidecar() {
                         className={cn(
                           "max-w-[85%] rounded-2xl px-4 py-3",
                           isUser
-                            ? "bg-white/10 text-white"
-                            : "bg-white/5 text-white/90 border border-white/10"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-accent text-foreground"
                         )}
                       >
                         <p className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -303,10 +299,10 @@ export function AISidecar() {
               {/* Loading indicator */}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-white/5 border border-white/10 rounded-2xl px-4 py-3">
+                  <div className="bg-accent rounded-2xl px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <Loader2 className="w-4 h-4 text-white/60 animate-spin" />
-                      <span className="text-sm text-white/40">Thinking...</span>
+                      <Loader2 className="w-3.5 h-3.5 text-muted-foreground animate-spin" />
+                      <span className="text-sm text-muted-foreground">Thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -315,30 +311,31 @@ export function AISidecar() {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Input area */}
+            {/* Input area - refined */}
             <form
               onSubmit={handleSubmit}
-              className="p-4 border-t border-white/10"
+              className="p-4 border-t border-border"
             >
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Describe what happened..."
+                  placeholder="Message..."
                   disabled={isLoading}
                   className={cn(
                     "flex-1 px-4 py-3 rounded-xl text-sm",
-                    "bg-white/5 border border-white/10 text-white",
-                    "placeholder:text-white/30",
-                    "focus:outline-none focus:border-white/20",
-                    "disabled:opacity-50"
+                    "bg-accent text-foreground",
+                    "placeholder:text-muted-foreground",
+                    "focus:outline-none focus:ring-2 focus:ring-ring",
+                    "disabled:opacity-50 transition-smooth"
                   )}
                 />
                 <Button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="px-4 bg-white/10 border border-white/20 hover:bg-white/20"
+                  size="icon"
+                  className="rounded-xl w-11 h-11"
                 >
                   <Send className="w-4 h-4" />
                 </Button>
@@ -348,10 +345,10 @@ export function AISidecar() {
         )}
       </aside>
 
-      {/* Backdrop overlay on mobile */}
+      {/* Backdrop overlay on mobile - refined */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 md:hidden"
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden transition-smooth"
           onClick={() => setIsOpen(false)}
           onKeyDown={(e) => e.key === "Escape" && setIsOpen(false)}
           role="button"

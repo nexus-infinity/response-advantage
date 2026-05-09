@@ -98,45 +98,45 @@ export default function GroundPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0d1117] text-white">
-      {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl" style={{ color: VERTICES["▼"].color }}>▼</span>
+    <main className="min-h-screen bg-background text-foreground">
+      {/* Header - Apple-inspired */}
+      <header className="flex items-center justify-between px-8 py-6 border-b border-border">
+        <div className="flex items-center gap-4">
+          <span className="text-xl" style={{ color: VERTICES["▼"].color }}>▼</span>
           <div>
-            <h1 className="text-lg font-medium tracking-wide">TATA — Ground</h1>
-            <p className="text-xs text-white/40">Legal framework and validation</p>
+            <h1 className="text-lg font-semibold tracking-tight">TATA</h1>
+            <p className="text-xs text-muted-foreground">Legal framework and validation</p>
           </div>
         </div>
         
-        {/* Gate status */}
+        {/* Gate status - refined */}
         <div className={cn(
-          "flex items-center gap-2 px-4 py-2 rounded-full text-sm",
+          "flex items-center gap-2 px-4 py-2 rounded-full text-xs font-medium tracking-wide",
           allRequiredPassed 
-            ? "bg-green-500/20 text-green-400"
-            : "bg-red-500/20 text-red-400"
+            ? "bg-green-500/10 text-green-600 dark:text-green-400"
+            : "bg-destructive/10 text-destructive"
         )}>
           {allRequiredPassed ? (
             <>
-              <Unlock className="w-4 h-4" />
+              <Unlock className="w-3.5 h-3.5" />
               <span>Gate Open</span>
             </>
           ) : (
             <>
-              <Lock className="w-4 h-4" />
+              <Lock className="w-3.5 h-3.5" />
               <span>Gate Locked</span>
             </>
           )}
         </div>
       </header>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-6xl mx-auto px-8 py-10">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
           
           {/* Left: Legal Frameworks */}
-          <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-sm font-medium text-white/70 tracking-wider mb-4">
-              LEGAL FRAMEWORKS
+          <div className="lg:col-span-2 space-y-3">
+            <h2 className="text-xs font-medium text-muted-foreground tracking-wider uppercase mb-5">
+              Legal Frameworks
             </h2>
 
             {LEGAL_FRAMEWORKS.map((law) => {
@@ -146,83 +146,82 @@ export default function GroundPage() {
                   key={law.id}
                   onClick={() => toggleLaw(law.id)}
                   className={cn(
-                    "p-5 rounded-xl border cursor-pointer transition-all",
+                    "p-5 rounded-2xl cursor-pointer transition-smooth",
                     isSelected
-                      ? "bg-white/10 border-white/20"
-                      : "bg-white/5 border-white/10 hover:border-white/15"
+                      ? "bg-accent shadow-soft"
+                      : "bg-accent/50 hover:bg-accent"
                   )}
                   style={{
-                    borderLeftColor: isSelected ? VERTICES["▼"].color : undefined,
-                    borderLeftWidth: isSelected ? 3 : 1,
+                    borderLeft: isSelected ? `3px solid ${VERTICES["▼"].color}` : "3px solid transparent",
                   }}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="text-xs text-white/40 mb-1">{law.act}</p>
+                      <p className="text-xs text-muted-foreground mb-1">{law.act}</p>
                       <p className="text-sm font-medium" style={{ color: VERTICES["▼"].color }}>
                         {law.section} — {law.title}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-white/10 text-white/50">
+                      <span className="text-[10px] px-2 py-1 rounded-lg bg-background/50 text-muted-foreground">
                         {law.jurisdiction}
                       </span>
                       {isSelected && (
-                        <CheckCircle2 className="w-5 h-5 text-green-500" />
+                        <CheckCircle2 className="w-4 h-4 text-green-500" />
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-white/60 leading-relaxed">{law.desc}</p>
+                  <p className="text-sm text-foreground/60 leading-relaxed">{law.desc}</p>
                 </div>
               )
             })}
           </div>
 
           {/* Right: Validation Panel */}
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Checkpoints */}
-            <div className="p-5 rounded-xl border border-white/10 bg-white/5">
-              <h3 className="text-sm font-medium text-white/70 mb-4">VALIDATION CHECKPOINTS</h3>
+            <div className="p-5 rounded-2xl bg-accent/50">
+              <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-4">Validation</h3>
               
               <div className="space-y-3">
                 {VALIDATION_CHECKPOINTS.map((cp) => (
                   <div key={cp.id} className="flex items-center gap-3">
                     {checkpoints[cp.id] ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
                     ) : (
-                      <AlertTriangle className="w-5 h-5 text-red-400" />
+                      <AlertTriangle className="w-4 h-4 text-destructive" />
                     )}
                     <span className={cn(
                       "text-sm",
-                      checkpoints[cp.id] ? "text-white/70" : "text-red-400/80"
+                      checkpoints[cp.id] ? "text-foreground/70" : "text-destructive/80"
                     )}>
                       {cp.label}
-                      {cp.required && <span className="text-red-400 ml-1">*</span>}
+                      {cp.required && <span className="text-destructive ml-1">*</span>}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <p className="text-xs text-white/40">
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-xs text-muted-foreground">
                   {allRequiredPassed 
-                    ? "All required checkpoints passed. You may proceed to ATLAS."
-                    : "Complete required checkpoints to unlock the gate."}
+                    ? "All checkpoints passed. Proceed to ATLAS."
+                    : "Complete required checkpoints to unlock."}
                 </p>
               </div>
             </div>
 
             {/* Quick Output */}
-            <div className="p-5 rounded-xl border border-white/10 bg-white/5">
+            <div className="p-5 rounded-2xl bg-accent/50">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium text-white/70">QUICK OUTPUT</h3>
+                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Quick Output</h3>
                 <button
                   onClick={copyToClipboard}
                   disabled={selectedLaws.length === 0}
                   className={cn(
-                    "p-2 rounded-lg transition-colors",
+                    "p-2 rounded-lg transition-smooth",
                     selectedLaws.length > 0
-                      ? "hover:bg-white/10 text-white/60"
+                      ? "hover:bg-background/50 text-muted-foreground"
                       : "opacity-30 cursor-not-allowed"
                   )}
                 >
@@ -234,7 +233,7 @@ export default function GroundPage() {
                 </button>
               </div>
               
-              <p className="text-sm text-white/60 leading-relaxed">
+              <p className="text-sm text-foreground/60 leading-relaxed">
                 {quickOutput}
               </p>
             </div>
@@ -243,12 +242,7 @@ export default function GroundPage() {
             <Link href={allRequiredPassed ? "/reduce" : "#"}>
               <Button
                 disabled={!allRequiredPassed}
-                className={cn(
-                  "w-full",
-                  allRequiredPassed
-                    ? "bg-white/10 hover:bg-white/20 text-white border border-white/20"
-                    : "bg-white/5 text-white/30 border border-white/10 cursor-not-allowed"
-                )}
+                className="w-full rounded-xl"
               >
                 {allRequiredPassed ? (
                   <>
@@ -266,8 +260,8 @@ export default function GroundPage() {
             {/* Back to AKRON */}
             <Link href="/akron">
               <Button
-                variant="outline"
-                className="w-full bg-transparent border-white/10 text-white/50 hover:text-white hover:border-white/20"
+                variant="ghost"
+                className="w-full rounded-xl text-muted-foreground"
               >
                 <span style={{ color: VERTICES["♦︎"].color }} className="mr-2">♦︎</span>
                 Return to AKRON

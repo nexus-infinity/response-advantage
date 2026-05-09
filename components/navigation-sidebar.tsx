@@ -34,10 +34,12 @@ export function NavigationSidebar() {
       {/* Mobile overlay */}
       {mobileOpen && <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setMobileOpen(false)} />}
 
-      {/* Sidebar - hidden on mobile unless open */}
+      {/* Sidebar - Apple-inspired glass panel */}
       <div
         className={cn(
-          "fixed left-0 top-0 h-screen w-20 bg-card border-r border-border flex flex-col items-center py-8 gap-8 z-50 stone-edge transition-transform duration-300",
+          "fixed left-0 top-0 h-screen w-20 flex flex-col items-center py-6 gap-6 z-50",
+          "bg-sidebar/80 backdrop-blur-xl border-r border-sidebar-border",
+          "transition-transform duration-300 ease-out",
           "md:translate-x-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
         )}
@@ -54,24 +56,24 @@ export function NavigationSidebar() {
         <Link
           href="/"
           onClick={() => setMobileOpen(false)}
-          className="flex items-center justify-center w-12 h-12 rounded-lg hover:bg-white/5 transition-colors group"
+          className="flex items-center justify-center w-11 h-11 rounded-2xl hover:bg-sidebar-accent transition-smooth group"
           title="FIELD System"
         >
-          <div className="flex flex-col items-center gap-0 text-[10px] leading-tight">
-            <span style={{ color: "#8B4513" }}>♦︎</span>
-            <span style={{ color: "#7B6B8D" }}>●</span>
-            <span style={{ color: "#A85D3B" }}>▼</span>
-            <span style={{ color: "#9A7B2C" }}>▲</span>
-            <span style={{ color: "#4A6FA5" }}>◼︎</span>
-            <span style={{ color: "#6B8E6B" }}>⊗</span>
+          <div className="flex flex-col items-center gap-px text-[9px] leading-none tracking-tight">
+            <span className="opacity-80" style={{ color: "#8B4513" }}>♦︎</span>
+            <span className="opacity-80" style={{ color: "#7B6B8D" }}>●</span>
+            <span className="opacity-80" style={{ color: "#A85D3B" }}>▼</span>
+            <span className="opacity-80" style={{ color: "#9A7B2C" }}>▲</span>
+            <span className="opacity-80" style={{ color: "#4A6FA5" }}>◼︎</span>
+            <span className="opacity-40" style={{ color: "#6B8E6B" }}>⊗</span>
           </div>
         </Link>
 
-        {/* Divider */}
-        <div className="w-8 h-px bg-border" />
+        {/* Divider - subtle */}
+        <div className="w-8 h-px bg-sidebar-border" />
 
-        {/* 6-Vertex Navigation - full FIELD system */}
-        <nav className="flex flex-col items-center gap-1 flex-1">
+        {/* 6-Vertex Navigation - Apple-inspired */}
+        <nav className="flex flex-col items-center gap-0.5 flex-1">
           {VERTEX_ROUTES.map((route) => {
             const isActive = pathname === route.href
             const isDisabled = route.status === "coming-soon"
@@ -80,11 +82,11 @@ export function NavigationSidebar() {
               return (
                 <div
                   key={route.href}
-                  className="flex flex-col items-center justify-center w-14 h-10 rounded-xl opacity-30 cursor-not-allowed group relative"
+                  className="flex flex-col items-center justify-center w-14 h-11 rounded-xl opacity-25 cursor-not-allowed"
                   title={`${route.label} - Coming soon`}
                 >
-                  <span className="text-base" style={{ color: route.color }}>{route.symbol}</span>
-                  <span className="text-[8px] mt-0.5 text-white/30">{route.label}</span>
+                  <span className="text-sm" style={{ color: route.color }}>{route.symbol}</span>
+                  <span className="text-[7px] mt-0.5 text-muted-foreground tracking-wide uppercase">{route.label}</span>
                 </div>
               )
             }
@@ -95,56 +97,56 @@ export function NavigationSidebar() {
                 href={route.href}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex flex-col items-center justify-center w-14 h-12 rounded-xl transition-all group relative",
-                  isActive ? "bg-white/10" : "hover:bg-white/5",
+                  "flex flex-col items-center justify-center w-14 h-11 rounded-xl transition-smooth group relative",
+                  isActive 
+                    ? "bg-sidebar-accent shadow-soft" 
+                    : "hover:bg-sidebar-accent/50",
                 )}
-                style={{
-                  borderLeft: isActive ? `2px solid ${route.color}` : "2px solid transparent",
-                }}
                 title={route.label}
               >
                 <span
-                  className="text-base transition-opacity"
+                  className="text-sm transition-smooth"
                   style={{ 
                     color: route.color,
-                    opacity: isActive ? 1 : 0.6,
+                    opacity: isActive ? 1 : 0.7,
+                    transform: isActive ? "scale(1.1)" : "scale(1)",
                   }}
                 >
                   {route.symbol}
                 </span>
                 <span className={cn(
-                  "text-[8px] mt-0.5 transition-colors",
-                  isActive ? "text-white/70" : "text-white/40"
+                  "text-[7px] mt-0.5 tracking-wide uppercase transition-smooth",
+                  isActive ? "text-foreground/80" : "text-muted-foreground"
                 )}>
                   {route.label}
                 </span>
 
-                {/* Tooltip on hover - desktop only */}
-                <div className="absolute left-full ml-3 px-3 py-2 bg-black/90 border border-white/10 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity hidden md:block z-50">
-                  <p className="text-xs font-medium text-white whitespace-nowrap">{route.label}</p>
-                  <p className="text-[10px] text-white/50 whitespace-nowrap">{route.desc}</p>
+                {/* Tooltip - refined glassmorphism */}
+                <div className="absolute left-full ml-4 px-3 py-2 glass shadow-elevated rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-smooth hidden md:block z-50">
+                  <p className="text-xs font-medium text-foreground whitespace-nowrap">{route.label}</p>
+                  <p className="text-[10px] text-muted-foreground whitespace-nowrap">{route.desc}</p>
                 </div>
               </Link>
             )
           })}
         </nav>
 
-        {/* Divider */}
-        <div className="w-8 h-px bg-border" />
+        {/* Divider - subtle */}
+        <div className="w-8 h-px bg-sidebar-border" />
 
-        {/* New Case button */}
+        {/* New Case button - refined */}
         <Link
           href="/start"
           onClick={() => setMobileOpen(false)}
-          className="flex flex-col items-center justify-center w-14 h-14 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group"
+          className="flex flex-col items-center justify-center w-11 h-11 rounded-xl bg-sidebar-accent hover:bg-sidebar-accent/80 transition-smooth group shadow-soft"
           title="Start new case"
         >
-          <Plus className="w-5 h-5 text-white/40 group-hover:text-white/60" />
-          <span className="text-[9px] mt-0.5 text-white/40 group-hover:text-white/60">New</span>
+          <Plus className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-smooth" />
+          <span className="text-[7px] mt-0.5 tracking-wide uppercase text-muted-foreground group-hover:text-foreground transition-smooth">New</span>
         </Link>
 
-        {/* Status indicator */}
-        <div className="w-2 h-2 rounded-full bg-green-500/60 animate-pulse" title="System Active" />
+        {/* Status indicator - refined */}
+        <div className="w-1.5 h-1.5 rounded-full bg-green-500" title="System Active" />
       </div>
     </>
   )

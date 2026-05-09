@@ -47,10 +47,10 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} font-sans antialiased`}>
+    <html lang="en" className="dark bg-background">
+      <body className={`${inter.className} ${jetbrainsMono.variable} font-sans min-h-screen`}>
         <NavigationSidebar />
-        <div className="md:ml-20">{children}</div>
+        <main className="md:ml-20 min-h-screen">{children}</main>
         <AISidecar />
         <Toaster />
         <Analytics />
