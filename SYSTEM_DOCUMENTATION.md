@@ -13,14 +13,43 @@ Response Advantage is a geometric complaint documentation system that transforms
 
 ## Core Concepts
 
-### The Symbol System
+### The 6-Vertex FIELD System
 
-| Symbol | Stage | Color | Chakra | Entity | Purpose |
-|--------|-------|-------|--------|--------|---------|
-| ● | OBSERVE | `#7B6B8D` (muted violet) | Crown/Third Eye | OBI-WAN | Capture raw observations, evidence, what happened |
-| ▼ | GROUND | `#A85D3B` (terracotta) | Sacral | TATA | Anchor to legal framework, rights, jurisdiction |
-| ▲ | RECOGNISE | `#9A7B2C` (antique gold) | Solar Plexus | ATLAS | Find contradictions, pattern recognition |
-| ◼ | ACT | `#4A6FA5` (steel blue) | Throat | DOJO | Generate outputs, manifestation, ready-to-send |
+| Symbol | Vertex | Color | Entity | Route | Purpose | Status |
+|--------|--------|-------|--------|-------|---------|--------|
+| ♦︎ | AKRON | `#8B4513` (sienna) | Intake | `/akron` | Fail-closed intake + HOLD zone | Active |
+| ● | OBI-WAN | `#7B6B8D` (muted violet) | Observer | `/observe` | Capture raw observations | Active |
+| ▼ | TATA | `#A85D3B` (terracotta) | Evidence | `/ground` | Legal grounding + validation gate | Active |
+| ▲ | ATLAS | `#9A7B2C` (antique gold) | Intelligence | `/reduce` | Pattern recognition, contradictions | Active |
+| ◼︎ | DOJO | `#4A6FA5` (steel blue) | Manifestation | `/act` | Output generation | Active |
+| ⊗ | ARKADAS | `#6B8E6B` (sage green) | Coordination | `/spin` | Routing decisions, state continuity | Coming Soon |
+
+### Intake Packet Schema
+
+Every route writes/updates the same `IntakePacket` object. The router validates it and returns `HOLD` or `NEXT`.
+
+```typescript
+interface IntakePacket {
+  case_id: string
+  ref: string                    // FIELD-[MATTERCODE]-YYYYMMDD-NNN
+  stage: number                  // S0-S11 mapping
+  vertex: Vertex                 // Current position
+  observed: string | null        // ● What was observed
+  interpretation: string | null  // ▲ What it means
+  recommendation: string | null  // ◼︎ What to do
+  anchors: Anchor[]              // Proof of existence
+  triangle_check: TriangleCheck  // Fact/Doc/Ledger status
+  hold: boolean                  // Currently blocked?
+  hold_reasons: string[]         // Exact missing pins
+}
+```
+
+### Triangle Validation
+
+Every packet must pass the triangle check before proceeding:
+- **Fact**: What happened (observation recorded)
+- **Doc**: Supporting evidence (anchors attached)
+- **Ledger**: Audit trail (receipts logged)
 
 ### Output Duality
 
@@ -39,16 +68,18 @@ Every stage produces TWO outputs:
 ├── page.tsx              # Landing page with hero transformation
 ├── layout.tsx            # Root layout with sidebars
 ├── globals.css           # Tailwind v4 + design tokens
-├── observe/page.tsx      # ● Stage - Evidence capture
-├── ground/page.tsx       # ▼ Stage - Legal framework (STUB)
-├── reduce/page.tsx       # ▲ Stage - Dialectic reduction
-├── act/page.tsx          # ◼ Stage - Output generation (STUB)
+├── akron/page.tsx        # ♦︎ AKRON - HOLD queue + validation
+├── observe/page.tsx      # ● OBI-WAN - Evidence capture
+├── ground/page.tsx       # ▼ TATA - Legal framework + gate
+├── reduce/page.tsx       # ▲ ATLAS - Dialectic reduction
+├── act/page.tsx          # ◼︎ DOJO - Output generation (STUB)
 ├── start/page.tsx        # Case initiation
 ├── processing/page.tsx   # Cinematic map sequence
 ├── result/page.tsx       # Final output display
 ├── case/[id]/page.tsx    # Individual case view
 └── api/
     ├── chat/route.ts     # AI SDK 6 streaming chat
+    ├── route/route.ts    # FIELD router (HOLD/NEXT decisions)
     ├── upload/route.ts   # File upload handler
     ├── dialectic/route.ts # Reduction engine proxy
     ├── geocode/route.ts  # Address to coordinates
