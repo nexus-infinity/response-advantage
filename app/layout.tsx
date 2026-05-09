@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { NavigationSidebar } from "@/components/navigation-sidebar"
 import { AISidecar } from "@/components/ai-sidecar"
+import CoherenceHUD from "@/components/coherence-hud"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
@@ -52,6 +53,7 @@ export default async function RootLayout({
         <NavigationSidebar />
         <main className="md:ml-20 min-h-screen">{children}</main>
         <AISidecar />
+        <CoherenceHUD />
         <Toaster />
         <Analytics />
       </body>

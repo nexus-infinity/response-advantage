@@ -273,56 +273,50 @@ export default function LandingPage() {
         <div className="flex-1 flex items-center justify-center px-4 py-8">
           <div className="w-full max-w-5xl">
 
-            {/* CHAOS STATE - The source material */}
+            {/* CHAOS STATE - The source material (REDUCED MOTION) */}
             {stage === "chaos" && (
               <div className="relative min-h-[400px] animate-in fade-in duration-700">
-                {/* Scattered chaos fragments */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-full max-w-2xl h-[350px]">
-                    {CHAOS_FRAGMENTS.map((fragment, idx) => {
-                      const positions = [
-                        { x: 0, y: -120, rotate: -2 },
-                        { x: -150, y: -40, rotate: -5 },
-                        { x: 150, y: -60, rotate: 4 },
-                        { x: -100, y: 50, rotate: -3 },
-                        { x: 100, y: 70, rotate: 2 },
-                        { x: -50, y: 130, rotate: -1 },
-                        { x: 50, y: 150, rotate: 3 },
-                      ]
-                      const pos = positions[idx]
+                {/* Subtle centered display instead of scattered chaos */}
+                <div className="absolute inset-0 flex items-center justify-center px-4">
+                  <div className="w-full max-w-2xl">
+                    {/* Single container - calm, centered, professional */}
+                    <div className="bg-background/50 border border-border/50 rounded-2xl p-8 space-y-4">
+                      <p className="text-white/50 text-sm mb-6 leading-relaxed">
+                        You received this institutional response. It&apos;s confusing, contradictory, designed to exhaust.
+                      </p>
 
-                      return (
-                        <div
-                          key={idx}
-                          className="absolute left-1/2 top-1/2 bg-white/5 border border-white/10 rounded-lg px-4 py-3 backdrop-blur-sm animate-in fade-in zoom-in-95 duration-700"
-                          style={{
-                            transform: `translate(-50%, -50%) translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotate}deg)`,
-                            animationDelay: `${idx * 100}ms`,
-                            maxWidth: "280px",
-                          }}
-                        >
-                          <p className="text-sm text-white/60">{fragment.text}</p>
-                          <span
-                            className={`text-[9px] font-mono mt-1 inline-block px-1.5 py-0.5 rounded ${
-                              fragment.type === "admission"
-                                ? "bg-amber-500/20 text-amber-400/70"
-                                : fragment.type === "deflection"
-                                  ? "bg-red-500/20 text-red-400/70"
-                                  : "bg-white/10 text-white/40"
-                            }`}
+                      {/* Chaos fragments displayed as a quiet list, not scattered */}
+                      <div className="space-y-2">
+                        {CHAOS_FRAGMENTS.slice(0, 4).map((fragment, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-3 p-3 bg-background/30 rounded-lg border border-border/30 animate-in fade-in duration-500"
+                            style={{ animationDelay: `${idx * 100}ms` }}
                           >
-                            {fragment.type}
-                          </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
+                            <span className="text-muted-foreground/60 text-sm font-mono shrink-0">
+                              {idx + 1}.
+                            </span>
+                            <span className="text-white/60 text-sm flex-1">{fragment.text}</span>
+                            <span
+                              className={`text-[9px] font-mono px-2 py-1 rounded shrink-0 ${
+                                fragment.type === "admission"
+                                  ? "bg-amber-500/20 text-amber-400/70"
+                                  : fragment.type === "deflection"
+                                    ? "bg-red-500/20 text-red-400/70"
+                                    : "bg-white/10 text-white/40"
+                              }`}
+                            >
+                              {fragment.type}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
 
-                {/* Chaos label */}
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 text-center">
-                  <p className="text-white/50 text-sm mb-1">You received this...</p>
-                  <p className="text-white/30 text-xs">Confusing. Contradictory. Designed to exhaust.</p>
+                      <p className="text-white/30 text-xs pt-4 border-t border-border/30">
+                        This is where it ends. This is where Response Advantage begins.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
