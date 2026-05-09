@@ -1,125 +1,136 @@
-"use client"
+/**
+ * ◼︎ DOJO - Output Generation
+ * 
+ * HARD-GATED by GROUND_PASS
+ * This page CANNOT be reached if:
+ * - Triangle validation incomplete
+ * - No anchors attached
+ * - No recommendation present
+ * 
+ * This is not a UI check. It's an enforced exception.
+ */
 
-import Link from "next/link"
+import { GroundGate, AkronHoldException } from "@/lib/types/cryptographic-system"
+import { IntakePacket } from "@/lib/types/intake-packet"
 
-// Symbol colors - muted, chakra-aligned
-const SYMBOL_COLORS = {
-  "●": "#7B6B8D",
-  "▼": "#A85D3B",
-  "▲": "#9A7B2C",
-  "◼": "#4A6FA5",
+// Mock: In production, fetch from session/database
+async function getIntakePacket(): Promise<IntakePacket | null> {
+  // TODO: Implement proper packet retrieval from session
+  return null
 }
 
-const ACTION_TEMPLATES = [
-  {
-    type: "FOI Request",
-    status: "Ready",
-    preview: "Pursuant to the Freedom of Information Act 1982, I request access to all documents relating to...",
-  },
-  {
-    type: "Formal Response",
-    status: "Ready",
-    preview: "Dear Sir/Madam, I write in response to your correspondence dated...",
-  },
-  {
-    type: "Ombudsman Referral",
-    status: "Ready",
-    preview: "I wish to lodge a complaint regarding the administrative actions of...",
-  },
-  {
-    type: "Case Record",
-    status: "Permanent",
-    preview: "Complete chronological record of all events, correspondence, and evidence...",
-  },
-]
+export const metadata = {
+  title: "DOJO — Output Generation",
+  description: "Generate and send actionable outputs",
+}
 
-export default function ActPage() {
+export default async function ActPage() {
+  // Fetch the current packet
+  const packet = await getIntakePacket()
+
+  if (!packet) {
+    // Redirect handled in middleware
+    return null
+  }
+
+  // ENFORCE the gate - this is not optional
+  const gate = new GroundGate(packet)
+
+  if (!gate.isOpen) {
+    // Throw exception - page is completely unreachable
+    const failures = []
+    
+    if (packet.triangle_check.fact === "pending") failures.push("TRIANGLE_INCOMPLETE")
+    if (packet.triangle_check.doc === "pending") failures.push("MISSING_ANCHOR")
+    if (packet.triangle_check.ledger === "pending") failures.push("CLAIM_UNSUPPORTED")
+    if (packet.anchors.length === 0) failures.push("MISSING_ANCHOR")
+    if (!packet.recommendation) failures.push("CLAIM_UNSUPPORTED")
+
+    throw new AkronHoldException(failures.length > 0 ? failures : ["TRIANGLE_INCOMPLETE"])
+  }
+
+  // Gate is open - render ACT
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-base" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
-          <span className="text-sm font-medium tracking-wider">ACT</span>
-        </Link>
-        <nav className="flex items-center gap-4">
-          {(["●", "▼", "▲", "◼"] as const).map((s) => (
-            <Link
-              key={s}
-              href={s === "●" ? "/observe" : s === "▼" ? "/ground" : s === "▲" ? "/reduce" : "/act"}
-              className="text-base transition-opacity hover:opacity-100"
-              style={{ color: SYMBOL_COLORS[s], opacity: s === "◼" ? 1 : 0.4 }}
-            >
-              {s}
-            </Link>
-          ))}
-        </nav>
+      <header className="flex items-center justify-between px-8 py-6 border-b border-border">
+        <div className="flex items-center gap-4">
+          <span className="text-xl" style={{ color: "#4A6FA5" }}>◼︎</span>
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight">DOJO</h1>
+            <p className="text-xs text-muted-foreground">Output generation and execution</p>
+          </div>
+        </div>
+        <span className="text-xs px-3 py-1.5 rounded-full bg-green-500/10 text-green-600 dark:text-green-400 font-medium tracking-wide">
+          GATE OPEN
+        </span>
       </header>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <div 
-            className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
-            style={{ backgroundColor: `${SYMBOL_COLORS["◼"]}20` }}
-          >
-            <span className="text-3xl" style={{ color: SYMBOL_COLORS["◼"] }}>◼</span>
-          </div>
-          <h1 className="text-2xl font-light tracking-wide mb-2">Ready Actions</h1>
-          <p className="text-white/50 text-sm">Send now, build your full case</p>
+      <div className="max-w-4xl mx-auto px-8 py-10 space-y-8">
+        
+        {/* Recommendation */}
+        <div className="p-6 rounded-2xl bg-accent/50 border border-border">
+          <h2 className="text-xs font-medium text-muted-foreground tracking-wider uppercase mb-4">
+            Recommendation
+          </h2>
+          <p className="text-foreground leading-relaxed text-sm">
+            {packet.recommendation}
+          </p>
         </div>
 
-        {/* Action templates */}
-        <div className="grid gap-4">
-          {ACTION_TEMPLATES.map((action, i) => (
-            <div
-              key={i}
-              className="p-6 rounded-xl border border-white/10 bg-white/5 hover:bg-white/[0.07] transition-colors"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <span 
-                    className="text-xs px-2 py-0.5 rounded-full"
-                    style={{ 
-                      backgroundColor: `${SYMBOL_COLORS["◼"]}20`,
-                      color: SYMBOL_COLORS["◼"],
-                    }}
-                  >
-                    {action.status}
-                  </span>
-                  <p className="text-sm font-medium text-white">{action.type}</p>
+        {/* Action Templates */}
+        <div>
+          <h2 className="text-xs font-medium text-muted-foreground tracking-wider uppercase mb-4">
+            Ready Actions
+          </h2>
+          <div className="space-y-3">
+            <div className="p-5 rounded-xl bg-accent/50 hover:bg-accent transition-smooth cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">FOI Request</p>
+                  <p className="text-xs text-muted-foreground mt-1">Pursuant to the Freedom of Information Act...</p>
                 </div>
-                <button 
-                  className="text-xs px-4 py-1.5 rounded-lg text-white transition-colors"
-                  style={{ backgroundColor: SYMBOL_COLORS["◼"] }}
-                >
-                  Send Now
+                <button className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-smooth">
+                  Send
                 </button>
               </div>
-              <p className="text-sm text-white/50 leading-relaxed">{action.preview}</p>
             </div>
-          ))}
+            <div className="p-5 rounded-xl bg-accent/50 hover:bg-accent transition-smooth cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Formal Response</p>
+                  <p className="text-xs text-muted-foreground mt-1">Dear Sir/Madam, I write in response...</p>
+                </div>
+                <button className="px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground hover:opacity-90 transition-smooth">
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Case summary */}
-        <div className="mt-12 p-6 rounded-xl border border-white/10 bg-white/5">
-          <p className="text-xs tracking-widest text-white/40 mb-4">CASE RECORD</p>
-          <div className="flex items-center gap-6 text-sm">
+        {/* Case Summary */}
+        <div className="p-6 rounded-2xl bg-accent/50 border border-border">
+          <h2 className="text-xs font-medium text-muted-foreground tracking-wider uppercase mb-4">
+            Case Summary
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-white/40 text-xs">Evidence</p>
-              <p className="text-white font-medium">4 items</p>
+              <p className="text-muted-foreground text-xs">Evidence</p>
+              <p className="text-foreground font-medium mt-1">{packet.anchors.length} items</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs">Laws Cited</p>
-              <p className="text-white font-medium">4 sections</p>
+              <p className="text-muted-foreground text-xs">Stage</p>
+              <p className="text-foreground font-medium mt-1">{packet.vertex}</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs">Contradictions</p>
-              <p className="text-white font-medium">2 found</p>
+              <p className="text-muted-foreground text-xs">Reference</p>
+              <p className="text-foreground font-medium mt-1 font-mono text-xs">{packet.ref}</p>
             </div>
             <div>
-              <p className="text-white/40 text-xs">Actions Ready</p>
-              <p className="text-white font-medium">4 templates</p>
+              <p className="text-muted-foreground text-xs">Status</p>
+              <p className="text-foreground font-medium mt-1">Ready to Act</p>
             </div>
           </div>
         </div>

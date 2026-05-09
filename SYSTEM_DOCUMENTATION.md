@@ -1,13 +1,15 @@
 # Response Advantage - System Documentation
 
 **Last Updated:** Session 2026-05-10  
-**Status:** Development - Phase 1 Complete, Phase 2 In Progress
+**Status:** Development - Phase 1 Complete, Phase 2 In Progress (Enforcement Layer Added)
 
 ---
 
 ## Overview
 
-Response Advantage is a geometric complaint documentation system that transforms chaotic institutional experiences into structured, actionable outputs. The system operates via a four-stage symbolic framework (●▼▲◼) that guides users from raw observation through to ready-to-send formal communications.
+Response Advantage is a geometric complaint documentation system that transforms chaotic institutional experiences into structured, actionable outputs. The system operates via a six-vertex symbolic framework with cryptographic enforcement that ensures case integrity across all stages.
+
+**Phase 2 Addition:** Machine-enforced contracts prevent "UI-only" bypasses. The `/act` page is now physically unreachable without completed ground validation.
 
 ---
 
@@ -51,11 +53,59 @@ Every packet must pass the triangle check before proceeding:
 - **Doc**: Supporting evidence (anchors attached)
 - **Ledger**: Audit trail (receipts logged)
 
-### Output Duality
+---
 
-Every stage produces TWO outputs:
-- **Quick**: Copy-paste ready sentence for immediate use
-- **Deep**: Comprehensive record with full metadata, timestamps, references
+## Enforcement Layer (Phase 2)
+
+### Cryptographic System
+
+The system now includes machine-enforced contracts that prevent "UI-only" bypasses:
+
+**New Files:**
+- `/lib/types/cryptographic-system.ts` - Signature verification, routing decisions, failure taxonomy
+- `/lib/utils/packet-store.ts` - Packet persistence and schema validation
+- `/components/akron-error-boundary.tsx` - Fail-closed exception handler
+- `/app/act/error.tsx` - Route-level error boundary
+
+### Critical Rules (Non-Negotiable)
+
+1. **GROUND_PASS Boolean Gate**
+   - `/act` is physically unreachable if `GROUND_PASS !== true`
+   - Gate enforces: triangle complete + anchors attached + recommendation present
+   - Throws `AkronHoldException` if conditions unmet
+   - No UI bypass possible
+
+2. **Packet Schema Lock**
+   - Single `IntakePacket` shape across all routes
+   - `validatePacketSchema()` enforces contract
+   - No variations allowed
+
+3. **⊗ ARKADAS Router (Signature Firewall)**
+   - Verifies GPG signatures on all transitions
+   - Returns `RoutingDecision` (structured, never prose)
+   - Validates graph transitions, state hashes, tampering detection
+   - Routes failures to ♦︎ AKRON (fail-closed)
+
+4. **Failure Taxonomy**
+   - Named, enumerated failures instead of vague "HOLD"
+   - Examples: `SIGNATURE_INVALID`, `STATE_TAMPER`, `MISSING_ANCHOR`, `ROUTE_VIOLATION`
+   - Each failure automatically routes to resolution path
+
+5. **Exception Architecture**
+   - `AkronHoldException` is a hard exception, not UI state
+   - Caught by error boundary and routed to `/akron`
+   - User cannot bypass; system is fail-closed by default
+
+### Enforcement Guarantees
+
+| Guarantee | Mechanism | Enforced By |
+|-----------|-----------|------------|
+| `/act` unreachable without ground validation | Server-side gate check + exception | `GroundGate` class + error boundary |
+| Packet integrity | SHA256 hashing + signature verification | Cryptographic system |
+| No field mutations | State hash comparison | ⊗ ARKADAS |
+| Deterministic routing | Transition graph + validation | Router logic |
+| No prose ambiguity | Structured `RoutingDecision` object | Type system |
+| Fail-closed by default | Exception-based control flow | Server Components |
 
 ---
 
