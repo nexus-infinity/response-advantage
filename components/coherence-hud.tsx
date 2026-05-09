@@ -27,7 +27,7 @@ export default function CoherenceHUD({
     { symbol: "◼︎", label: "DOJO", status: "pending", color: "#4A6FA5" },
     { symbol: "⊗", label: "ARKADAS", status: "pending", color: "#6B8E6B" },
   ],
-  isExpanded: false,
+  isExpanded = false,
   onExpandChange,
 }: CoherenceHUDProps) {
   const [expanded, setExpanded] = useState(isExpanded)
