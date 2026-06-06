@@ -2,3 +2,7 @@ packages:
   - "frontend"
   - "dojo"
   - "shared/geometric-core/typescript"
+allowBuilds:
+  esbuild: true
+  sharp: true
+  unrs-resolver: true

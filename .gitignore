@@ -14,7 +14,9 @@ out/
 
 # Environment (keep .env.example)
 .env
+.env.local
 .env*.local
+.vercel/
 
 # Logs
 *.log

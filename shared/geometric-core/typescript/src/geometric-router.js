@@ -75,7 +75,7 @@
  * Canonical routing table for S0→S7 pipeline
  */
 export const GEOMETRIC_ROUTES = {
-    S0: { symbol: '◻', stage: 'S0', frequency: 396, handler: 's0-akron-intake' },
+    S0: { symbol: '♦︎', stage: 'S0', frequency: 396, handler: 's0-akron-intake' },
     S1: { symbol: '🔷', stage: 'S1', handler: 's1-queens-validation' },
     S2: { symbol: '🎭', stage: 'S2', handler: 's2-vertex-router' },
     S3: { symbol: '●', stage: 'S3', frequency: 963, handler: 's3-gallery-amplifier' },

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "Canonical S0→S7 FIELD implementation for geometric alignment",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "src/index.js",
+  "types": "src/index.ts",
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
